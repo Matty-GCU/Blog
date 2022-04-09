@@ -1,12 +1,13 @@
 ---
+abbrlink: 4ec260e1
 title: Spring MVC学习笔记
 tags: Spring MVC
 categories:
-	- Java
-	- JavaEE
-	- SSM
-	- Spring MVC
-date: 2022-02-12
+  - Java
+  - JavaEE
+  - SSM
+  - Spring MVC
+date: 2022-02-12 00:00:00
 ---
 
 # Spring MVC学习笔记
