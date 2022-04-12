@@ -1,7 +1,10 @@
 ---
 abbrlink: c460cf59
 title: MyBatis3学习笔记
-tags: MyBatis
+tags:
+	- MyBatis
+	- Log4j
+	- Lombok
 categories:
 	- Java
 	- JavaEE

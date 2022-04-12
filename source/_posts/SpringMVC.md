@@ -1,7 +1,9 @@
 ---
 abbrlink: 4ec260e1
 title: Spring MVC学习笔记
-tags: Spring MVC
+tags:
+	- Spring MVC
+	- RESTful
 categories:
   - Java
   - JavaEE
@@ -33,7 +35,7 @@ date: 2022-04-05 19:45:00
 
 [Spring Framework 中文文档 - Web on Servlet 堆栈 | Docs4dev](https://www.docs4dev.com/docs/zh/spring-framework/5.1.3.RELEASE/reference/web.html)
 
-[SpringMVC | broken's blog](https://guopeixiong.github.io/2021/10/30/SpringMVC/)（broken基于同一教程的学习笔记，值得参考）
+[SpringMVC | broken's blog](https://guopeixiong.github.io/2021/10/30/SpringMVC/)（基于同一教程的学习笔记，值得参考）
 
 ### 0.4 本机环境
 
@@ -329,6 +331,8 @@ Spring的web框架围绕DispatcherServlet（调度Servlet）设计，其主要�
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+	<!--（从 Spring4.0开始，如果不配置处理器映射器、处理器适配器和视图解析器，Spring会使用默认配置来完成相应工作。）-->
+    
     <!-- 处理器映射器HandlerMapping，负责按照特定规则去查找Handler。 -->
     <!-- 只是为了理解原理才这么写，并非必要配置，注释掉也能正常运行。 -->
     <bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
@@ -425,6 +429,8 @@ Spring的web框架围绕DispatcherServlet（调度Servlet）设计，其主要�
 > ...
 
 #### 2.1.5 编写处理器
+
+在这种情况下，可以认为**HelloController类**既是**处理器handler**，又是**控制器controller**，也是**servlet**，这三个概念只是从不同角度描述了同一件事物。
 
 ```java
 import org.springframework.web.servlet.ModelAndView;
@@ -585,4 +591,365 @@ Ctrl+Shift+Alt+S唤出Project Structure窗口，查看Project Settings->Artifact
 >
 > ...
 
-## 三. 
+## 三. 使用注解开发SpringMVC
+
+### 3.1 修改项目`springmvc-02-hellomvc`
+
+直接在2.1的`springmvc-02-hellomvc`项目的基础上改动即可。
+
+**再写一个Controller**（注意包路径）：
+
+```java
+package com.example.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/hello")
+public class HelloControllerTwo {
+    
+    @RequestMapping("/two")
+    public String sayHello(Model model) {
+        String result = "Hello SpringMVC!";
+        model.addAttribute("result", result);
+        return "hello";
+    }
+}
+
+```
+
+**改一下springmvc配置文件**：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc
+       https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!--（从 Spring4.0开始，如果不配置处理器映射器、处理器适配器和视图解析器，Spring会使用默认配置来完成相应工作。）-->
+
+    <!-- 处理器映射器HandlerMapping，负责按照特定规则去查找Handler。 -->
+    <!-- 只是为了理解原理才这么写，并非必要配置，注释掉也能正常运行。 -->
+<!--    <bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>-->
+
+    <!-- 处理器适配器HandlerAdapter，负责按照特定规则去执行Handler。 -->
+    <!-- 只是为了理解原理才这么写，并非必要配置，注释掉也能正常运行。 -->
+<!--    <bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter"/>-->
+
+    <!-- 处理器Handler。该处理器是一个Controller，本质上是一个Servlet。 -->
+    <bean id="/hello" class="HelloController"/>
+
+    <!-- 视图解析器ViewResolver，负责解析视图名 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!-- 前缀 -->
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <!-- 后缀 -->
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+
+    <!-- 自动扫描指定包中的java文件，若扫描到被@Component、@Controller等注解标记的类，就将其注册为Bean，由Spring容器统一管理。 -->
+    <!--（因为是指定“某个”包，不是指定“某些”包，所以base-package的值没有"*"这种写法，更不能为""。）-->
+    <context:component-scan base-package="com.example.controller"/>
+
+    <!-- 使用Web容器默认的Servlet来处理对静态资源的请求，用于解决【静态资源访问】的问题 -->
+    <!-- 但是说实话我没有成功解决过这个问题，所以这里也算是一个TODO吧 -->
+    <mvc:default-servlet-handler/>
+
+    <!-- 支持SpringMVC注解驱动 -->
+    <!-- 狂神：在spring中一般采用@RequestMapping注解来完成映射关系，
+    要想使@RequestMapping注解生效，必须向上下文中注册DefaultAnnotationHandlerMapping和一个AnnotationMethodHandlerAdapter实例，
+    这两个实例分别在类级别和方法级别处理，而annotation-driven配置帮助我们自动完成上述两个实例的注入。 -->
+    <!--（经实测，其实注释掉这行也不影响程序运行，可能是SpringMVC默认帮我们配置好了。）-->
+    <mvc:annotation-driven/>
+
+</beans>
+```
+
+> 关于【静态资源访问】的问题：[SPRING-MVC访问静态文件,如jpg,js,css - LuisZach's Blog - ITeye博客](https://www.iteye.com/blog/lzy83925-1186609)
+
+**重新发布运行**：
+
+访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/hello/two`页面显示：Hello SpringMVC!
+
+### 3.2 符合RESTful规范的URL
+
+**扩展阅读**（这几篇博客质量都很高，非常值得一读）：
+
+[RESTful到底是什么？ - 张瑞丰 - 博客园](https://www.cnblogs.com/zhangruifeng/p/13257731.html)
+
+[RESTful API 最佳实践 - 阮一峰的网络日志](https://www.ruanyifeng.com/blog/2018/10/restful-api-best-practices.html)
+
+[理解RESTful架构 - 阮一峰的网络日志](https://www.ruanyifeng.com/blog/2011/09/restful.html)
+
+> 由于此时我的学习主线是Spring MVC，就不花过多时间去了解RESTful架构了，只需要知道在Spring MVC中怎么实现就好。
+
+**实现**：
+
+```java
+package com.example.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+public class RESTfulController {
+    
+    /**
+     * 无风格：/item?a=1&b=2
+     */
+    @RequestMapping("/item")
+    public String getAPlusB1(int a, int b, Model model) {
+        model.addAttribute("result", a + b);
+        return "hello";
+    }
+    
+    /**
+     * RESTful风格：/item/1/2
+     */
+    @RequestMapping("/item/{a}/{b}")
+    public String getAPlusB2(@PathVariable int a, @PathVariable int b, Model model) {
+        model.addAttribute("result", a + b);
+        return "hello";
+    }
+    
+    /**
+     * （在下面这两个方法中，我已经尽量使各种命名都符合RESTful规范，但这个规范不是重点，重点是在SpringMVC中如何用@RequestMapping注解实现它。）
+     * GET /article
+     */
+    @RequestMapping(path = "/article", method = RequestMethod.GET)
+//    @GetMapping("/article")
+    public String getArticle(@PathVariable int articleId, Model model) {
+        // 这里的方法体仅作示范
+        System.out.println("查到一篇文章");
+        // 实际上并不存在/WEB-INF/jsp/article.jsp。
+        return "article";
+    }
+    
+    /**
+     * POST /article
+     */
+    @RequestMapping(path = "/article", method = RequestMethod.POST)
+//    @PostMapping("/article")
+    public String addArticle(@PathVariable int articleId, Model model) {
+        System.out.println("发布一篇文章");
+        return "article";
+    }
+    
+    //此时如果用除了get和post方法之外的其他请求方法访问URL"/article"，会报405错误（注意不是404也不是500）
+}
+```
+
+### 3.3 @RequestMapping
+
+```java
+/**
+ * Annotation for mapping web requests onto methods in request-handling classes
+ * with flexible method signatures.
+ *
+ * ...
+ *
+ * <p><strong>Note:</strong> This annotation can be used both at the class and
+ * at the method level. In most cases, at the method level applications will
+ * prefer to use one of the HTTP method specific variants
+ * {@link GetMapping @GetMapping}, {@link PostMapping @PostMapping},
+ * {@link PutMapping @PutMapping}, {@link DeleteMapping @DeleteMapping}, or
+ * {@link PatchMapping @PatchMapping}.</p>
+ * 
+ * ...
+ */
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Mapping
+public @interface RequestMapping {
+    
+    @AliasFor("path")
+	String[] value() default {};
+    
+    @AliasFor("value")
+	String[] path() default {};
+    
+    RequestMethod[] method() default {};
+    
+    ...
+}
+```
+
+**总结一下**：
+
+可以使用@RequestMapping注解，将Web请求（web requests）映射到请求处理器的方法（methods in request-handling classes）上。
+
+注意@RequestMapping注解可以用在类（ElementType.TYPE）上和方法（ElementType.METHOD）上。当@RequestMapping用在方法上时，通常会使用其衍生注解（@GetMapping, @PostMapping, @PutMapping, @DeleteMapping, or @PatchMapping.）来指定一个HTTP请求类型（HTTP method）。
+
+> 我们随意看一个@PostMapping，
+>
+> ```java
+> /**
+>  * Annotation for mapping HTTP {@code POST} requests onto specific handler
+>  * methods.
+>  */
+> @Target(ElementType.METHOD)
+> @Retention(RetentionPolicy.RUNTIME)
+> @Documented
+> @RequestMapping(method = RequestMethod.POST)
+> public @interface PostMapping {
+>     ...
+> }
+> ```
+>
+> 很明显是“继承”自@RequestMapping，但@PostMapping只能用在方法上，并且已经指定了method = RequestMethod.POST。
+
+## 四. 重定向与转发
+
+转发（forward）发生在服务端，故客户端浏览器地址栏不变；
+
+重定向（redirect）发生在客户端，故客户端浏览器地址栏会改变。
+
+> 注意：
+>
+> 在Spring MVC中实现重定向和转发的方式有很多，这一章只是尽可能把它们全都罗列出来，但最常用的只是前两种而已。
+
+### 4.1 Spring MVC方式
+
+#### 4.1.1 ViewResolver + return ModelAndView
+
+在2.1访问`/hello`，最终访问到WEB-INF/jsp/hello.jsp，用的就是这种方式。我直接复制一部分关键代码过来：
+
+* HelloController.java
+
+```java
+@Override
+public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    ModelAndView modelAndView = new ModelAndView();
+    String result = "Hello SpringMVC!";
+    modelAndView.addObject("result", result);
+    modelAndView.setViewName("hello");
+    // 转发
+    return modelAndView;
+}
+```
+* springmvc-servlet.xml
+
+```xml
+<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <property name="prefix" value="/WEB-INF/jsp/"/>
+    <property name="suffix" value=".jsp"/>
+</bean>
+```
+
+#### 4.1.2 ViewResolver + return String
+
+在2.1访问`/hello/two`，最终访问到WEB-INF/jsp/hello.jsp，用的就是这种方式。同样复制一部分关键代码：
+
+* HelloController**Two**.java
+
+```java
+@Controller
+@RequestMapping("/hello")
+public class HelloControllerTwo {
+    
+    @RequestMapping("/two")
+    public String sayHello(Model model) {
+        String result = "Hello SpringMVC!";
+        model.addAttribute("result", result);
+        return "hello";
+    }
+}
+```
+
+* springmvc-servlet.xml
+
+```xml
+<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <property name="prefix" value="/WEB-INF/jsp/"/>
+    <property name="suffix" value=".jsp"/>
+</bean>
+```
+
+#### 4.1.3 return String
+
+* 新建一个**TestHelloController**.java（注意我们要访问的是**/index.jsp**，因为/WEB-INF/jsp/hello.jsp无法直接通过URL访问）
+
+```java
+package com.example.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/**
+ * 测试Spring MVC中不使用视图解析器的转发和重定向
+ */
+@Controller
+public class TestController {
+    
+    @RequestMapping("/forward1")
+    public String testForward1(Model model) {
+        String result = "通过转发，访问/index.jsp，地址栏无变化";
+        model.addAttribute("message", result);
+        // 这种写法只有当ViewResolver不存在时才生效
+        return "/index.jsp";
+    }
+    
+    @RequestMapping("/forward2")
+    public String testForward2(Model model) {
+        String result = "通过转发，访问/index.jsp，地址栏无变化";
+        model.addAttribute("message", result);
+        // 这种写法可以无视ViewResolver
+        return "forward:/index.jsp";
+    }
+    
+    @RequestMapping("/redirect")
+    public String testRedirect(Model model) {
+        String result = "（可以无视ViewResolver）通过重定向，访问/index.jsp，地址有变化！";
+        model.addAttribute("message", result);
+        // 这种写法可以无视ViewResolver
+        return "redirect:/index.jsp";
+    }
+}
+```
+
+* springmvc-servlet.xml
+
+```xml
+<!--    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">-->
+<!--        <property name="prefix" value="/WEB-INF/jsp/"/>-->
+<!--        <property name="suffix" value=".jsp"/>-->
+<!--    </bean>-->
+```
+
+### 4.2 Servlet原生API方式
+
+在1.3的纯Servlet项目中访问`/TestServlet`，最终访问到WEB-INF/jsp/test.jsp，用的就是这种方式。同样复制一部分关键代码：
+
+* **TestServlet**.java
+
+```java
+//@WebServlet(name = "myServlet", value = "/TestServlet")
+public class TestServlet extends HttpServlet {
+    
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// ...
+        // 转发
+        req.getRequestDispatcher("/WEB-INF/jsp/test.jsp").forward(req, resp);
+    }
+    
+}
+```
+
+```java
+		// 重定向
+		resp.sendRirect("/index");
+```
