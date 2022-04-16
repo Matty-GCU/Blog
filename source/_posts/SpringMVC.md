@@ -16,7 +16,7 @@ date: 2022-04-05 19:45:00
 
 ## 零. 前言
 
-### 0.1 基于教程TODO
+### 0.1 基于教程
 
 [【狂神说Java】SpringMVC最新教程IDEA版通俗易懂_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1aE41167Tu?p=3)（发布时间：2019-10-20）
 
@@ -24,6 +24,10 @@ date: 2022-04-05 19:45:00
 * [狂神说SpringMVC02：第一个MVC程序](https://mp.weixin.qq.com/s/8ddT6FD0Y4f3XdbEz0aqpQ)
 * [狂神说SpringMVC03：RestFul和控制器](https://mp.weixin.qq.com/s/3EtyzJohOVGz62nEYLhKHg)
 * [狂神说SpringMVC04：数据处理及跳转](https://mp.weixin.qq.com/s/1d_PAk2IIp-WWX2eBbU3aw)
+* [狂神说SpringMVC05：整合SSM框架](https://mp.weixin.qq.com/s/SDxqGu_il3MUCTcN1EYrng)
+* [狂神说SpringMVC06：Json交互处理](https://mp.weixin.qq.com/s/RAqRKZJqsJ78HRrJg71R1g)
+* [狂神说SpringMVC07：Ajax研究](https://mp.weixin.qq.com/s/tB4YX4H59wYS6rxaO3K2_g)
+* [狂神说SpringMVC08：拦截器+文件上传下载](https://mp.weixin.qq.com/s/NWJoYiirbkSDz6x01Jji3g)
 
 《Java EE框架整合开发入门到实战》 - 清华大学出版社（出版时间：2018-09）
 
@@ -35,7 +39,7 @@ date: 2022-04-05 19:45:00
 
 [Spring Framework 中文文档 - Web on Servlet 堆栈 | Docs4dev](https://www.docs4dev.com/docs/zh/spring-framework/5.1.3.RELEASE/reference/web.html)
 
-[SpringMVC | broken's blog](https://guopeixiong.github.io/2021/10/30/SpringMVC/)（基于同一教程的学习笔记，值得参考）
+[SpringMVC | lxzforever](https://www.lxzforever.top/2021/10/30/SpringMVC/)（基于同一教程的学习笔记，值得参考）
 
 ### 0.4 本机环境
 
@@ -683,7 +687,9 @@ public class HelloControllerTwo {
 
 ### 3.2 符合RESTful规范的URL
 
-**扩展阅读**（这几篇博客质量都很高，非常值得一读）：
+#### 3.2.1 扩展阅读
+
+这几篇博客质量都很高，非常值得一读：
 
 [RESTful到底是什么？ - 张瑞丰 - 博客园](https://www.cnblogs.com/zhangruifeng/p/13257731.html)
 
@@ -693,7 +699,9 @@ public class HelloControllerTwo {
 
 > 由于此时我的学习主线是Spring MVC，就不花过多时间去了解RESTful架构了，只需要知道在Spring MVC中怎么实现就好。
 
-**实现**：
+#### 3.2.2 实现
+
+* 在com.example.controller包下**新建RESTfulController**.java
 
 ```java
 package com.example.controller;
@@ -725,30 +733,67 @@ public class RESTfulController {
     
     /**
      * （在下面这两个方法中，我已经尽量使各种命名都符合RESTful规范，但这个规范不是重点，重点是在SpringMVC中如何用@RequestMapping注解实现它。）
-     * GET /article
+     * GET /article/{articleId}
      */
-    @RequestMapping(path = "/article", method = RequestMethod.GET)
-//    @GetMapping("/article")
+    @RequestMapping(path = "/article/{articleId}", method = RequestMethod.GET)
+//    @GetMapping("/article/{articleId}")
     public String getArticle(@PathVariable int articleId, Model model) {
-        // 这里的方法体仅作示范
-        System.out.println("查到一篇文章");
-        // 实际上并不存在/WEB-INF/jsp/article.jsp。
-        return "article";
+        model.addAttribute("articleId", articleId);
+        return "articleSelected";
     }
     
     /**
-     * POST /article
+     * POST /article/{articleId}
      */
-    @RequestMapping(path = "/article", method = RequestMethod.POST)
-//    @PostMapping("/article")
+    @RequestMapping(path = "/article/{articleId}", method = RequestMethod.POST)
+//    @PostMapping("/article/{articleId}")
     public String addArticle(@PathVariable int articleId, Model model) {
-        System.out.println("发布一篇文章");
-        return "article";
+        model.addAttribute("articleId", articleId);
+        return "articlePosted";
     }
     
     //此时如果用除了get和post方法之外的其他请求方法访问URL"/article"，会报405错误（注意不是404也不是500）
 }
 ```
+
+* 在WEB-INF/jsp目录下**创建articleSelected.jsp**
+
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Title</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    查到一篇文章：${articleId}
+</body>
+</html>
+```
+
+* 在WEB-INF/jsp目录下**创建articlePosted.jsp**
+
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Title</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    发布新文章：${articleId}
+</body>
+</html>
+```
+
+* 测试
+
+  * 访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/item?a=1&b=2`，显示`3`
+  * 访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/item/1/2`，显示`3`
+  * 以**GET**方式访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/article/123`，显示`123`
+  * 以**POST**方式访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/article/123`，应该会显示`123`（我懒得写个form表单去测试post请求方法了）
+
+  ![在浏览器开发者工具中查看请求方法](SpringMVC/在浏览器开发者工具中查看请求方法.png)
 
 ### 3.3 @RequestMapping
 
@@ -950,6 +995,313 @@ public class TestServlet extends HttpServlet {
 ```
 
 ```java
-		// 重定向
-		resp.sendRirect("/index");
+// 重定向
+resp.sendRirect("/index");
 ```
+
+## 五. 获取前端数据
+
+获取前端数据即**接收请求参数**。这部分内容其实在前面的代码中都或多或少涉及到了，这里我们简单做一下总结。
+
+扩展阅读：[Java 后端接收Request请求参数的7种方式_ShiuHB的博客-CSDN博客_java接收参数方式](https://blog.csdn.net/ShiuHB/article/details/109674343)
+
+**要获得URL`/test?id=5`中携带的参数，总共有如下方法：**
+
+至于RESTful风格的参数如何处理，前面3.2刚写，这里就不赘述了。
+
+### 5.1 方式一：使用Servlet API
+
+使用最原始的Servlet API，
+
+```java
+@Override
+protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    // ...
+	req.getAttribute("id");
+    // ...
+}
+```
+
+实际应用：1.3.4的TestServlet类中的doGet方法。
+
+### 5.2 方式二：直接通过方法同名参数获取
+
+当URL参数与处理器方法的参数名相同，可以直接通过方法参数获取。
+
+```java
+@RequestMapping("/test") 
+public String testMethod(String id){ 
+    ...
+}
+```
+
+实际应用：3.2.2的RESTfulController类中的getAPlusB1方法。
+
+### 5.3 方式三：使用@RequestParam注解
+
+当URL参数与处理器方法的参数名不同，可以使用@RequestParam注解。
+
+（Spring MVC的这个@RequestParam注解真的和[MyBatis中的@Param注解](https://wuhang.xyz/c460cf59.html#8-2-使用注解完成CURD)有异曲同工之妙啊）
+
+> 建议无论参数名是否相同，都使用@RequestParam注解，可以提高代码的可读性，让人一看就知道这个参数接收的是请求参数（所谓request parameter）。
+
+```java
+@RequestMapping("/test") 
+public String testMethod(@RequestParam("id") String xxx){ 
+    ...
+}
+```
+
+实际应用：见5.4。
+
+### 5.4 方式四：使用实体类接受URL参数
+
+若URL请求中的参数名与实体中的属性名一致，即可自动映射到实体属性中。
+
+**假设URL为`/test?id=1&name=wuhang&age=18`。**
+
+（这种方式和[在MyBatis中取出Mapper方法的参数对象的对应属性值](https://wuhang.xyz/c460cf59.html#insert)也是具有异曲同工之妙啊）
+
+```java
+@RequestMapping("/test") 
+public String testMethod(User user){ 
+    ...
+}
+```
+
+```java
+public class User {
+    String id;
+    String name;
+    int age;
+    
+    // getter、setter、全参构造
+}
+```
+
+实际应用：
+
+* 在com.example.controller包下**新建ParamTestController**.java
+
+```java
+package com.example.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@Controller
+public class ParamTestController {
+    
+    @RequestMapping("/test1")
+    public String testMethod1(@RequestParam("id") String userId){
+        System.out.println("id=" + userId);
+        return "forward:/index.jsp";
+    }
+    
+    @RequestMapping("/test2")
+    public String testMethod2(User user){
+        System.out.println(user);
+        return "forward:/index.jsp";
+    }
+    
+}
+
+class User {
+    
+    String id;
+    String name;
+    int age;
+    
+    //必须要有setter才能获取同名URL参数 !!!
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public void setAge(int age) {
+        this.age = age;
+    }
+    
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+* 测试
+
+  * 访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/test1?id=001`，控制台打印出`id=001`
+
+  * 访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/test1?id=1&name=wuhang&age=18`，控制台打印出`User{id='1', name='wuhang', age=18}`
+
+## 六. 将数据返回给前端
+
+### 6.1 方式一：通过ModelAndView
+
+家喻户晓，老少咸宜。
+
+实际应用：参照2.1.5。
+
+### 6.2 方式二：通过Model
+
+家喻户晓，老少咸宜。
+
+实际应用：参照3.1。
+
+### 6.3 方式三：通过ModelMap
+
+不常用。
+
+> 就对于新手而言简单来说使用区别就是：
+>
+> Model 只有寥寥几个方法只适合用于储存数据，简化了新手对于Model对象的操作和理解；
+>
+> ModelMap 继承了 LinkedMap ，除了实现了自身的一些方法，同样的继承 LinkedMap 的方法和特性；
+>
+> ModelAndView 可以在储存数据的同时，可以进行设置返回的逻辑视图，进行控制展示层的跳转。
+
+## 七. 解决乱码问题
+
+以前在写Servlet的时候，乱码问题通常通过手写并配置过滤器来解决。
+
+现在我们可以直接使用Spring MVC为我们提供的过滤器，原理是一样的，但是再也不用自己写了。
+
+```xml
+<filter>
+   <filter-name>encoding</filter-name>
+   <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+   <init-param>
+       <param-name>encoding</param-name>
+       <param-value>utf-8</param-value>
+   </init-param>
+</filter>
+<filter-mapping>
+   <filter-name>encoding</filter-name>
+   <!-- 注意/和/*的区别，前者不会匹配*.jsp -->
+   <url-pattern>/*</url-pattern>
+</filter-mapping>
+```
+
+如果还是解决不了，可以使用大佬（先人）写的功能更为强大的过滤器，并把它配置到web.xml中。
+
+> 下面这个代码是狂神提供的，但并不是他的原创。
+
+```java
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+
+/**
+* 解决get和post请求 全部乱码的过滤器
+*/
+public class GenericEncodingFilter implements Filter {
+
+   @Override
+   public void destroy() {
+  }
+
+   @Override
+   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+       //处理response的字符编码
+       HttpServletResponse myResponse=(HttpServletResponse) response;
+       myResponse.setContentType("text/html;charset=UTF-8");
+
+       // 转型为与协议相关对象
+       HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+       // 对request包装增强
+       HttpServletRequest myrequest = new MyRequest(httpServletRequest);
+       chain.doFilter(myrequest, response);
+  }
+
+   @Override
+   public void init(FilterConfig filterConfig) throws ServletException {
+  }
+
+}
+
+//自定义request对象，HttpServletRequest的包装类
+class MyRequest extends HttpServletRequestWrapper {
+
+   private HttpServletRequest request;
+   //是否编码的标记
+   private boolean hasEncode;
+   //定义一个可以传入HttpServletRequest对象的构造函数，以便对其进行装饰
+   public MyRequest(HttpServletRequest request) {
+       super(request);// super必须写
+       this.request = request;
+  }
+
+   // 对需要增强方法 进行覆盖
+   @Override
+   public Map getParameterMap() {
+       // 先获得请求方式
+       String method = request.getMethod();
+       if (method.equalsIgnoreCase("post")) {
+           // post请求
+           try {
+               // 处理post乱码
+               request.setCharacterEncoding("utf-8");
+               return request.getParameterMap();
+          } catch (UnsupportedEncodingException e) {
+               e.printStackTrace();
+          }
+      } else if (method.equalsIgnoreCase("get")) {
+           // get请求
+           Map<String, String[]> parameterMap = request.getParameterMap();
+           if (!hasEncode) { // 确保get手动编码逻辑只运行一次
+               for (String parameterName : parameterMap.keySet()) {
+                   String[] values = parameterMap.get(parameterName);
+                   if (values != null) {
+                       for (int i = 0; i < values.length; i++) {
+                           try {
+                               // 处理get乱码
+                               values[i] = new String(values[i]
+                                      .getBytes("ISO-8859-1"), "utf-8");
+                          } catch (UnsupportedEncodingException e) {
+                               e.printStackTrace();
+                          }
+                      }
+                  }
+              }
+               hasEncode = true;
+          }
+           return parameterMap;
+      }
+       return super.getParameterMap();
+  }
+
+   //取一个值
+   @Override
+   public String getParameter(String name) {
+       Map<String, String[]> parameterMap = getParameterMap();
+       String[] values = parameterMap.get(name);
+       if (values == null) {
+           return null;
+      }
+       return values[0]; // 取回参数的第一个值
+  }
+
+   //取所有值
+   @Override
+   public String[] getParameterValues(String name) {
+       Map<String, String[]> parameterMap = getParameterMap();
+       String[] values = parameterMap.get(name);
+       return values;
+  }
+}
+```
+
+## 八. JSON
