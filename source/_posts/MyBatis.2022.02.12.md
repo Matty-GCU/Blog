@@ -422,6 +422,10 @@ UserMapper.xml可以放在UserMapper的同级目录下。
 
 > 事实上 MyBatis 提供的所有特性都可以利用基于 XML 的映射语言来实现
 
+```xml
+
+```
+
 为了能实现在XML里写SQL的时候IDEA能够自动提醒和补全实际存在的数据库名、表名等等，我们需要做两件事，一是为项目添加数据源(Data Source)，也就是数据库，添加成功后我们甚至可以在IDEA内置的数据库控制台上运行SQL语句；二是设置项目的SQL方言(Project SQL Dialet)，毕竟SQL只是一个规范，IDEA必须知道我们使用的是哪个数据库软件的基于SQL的特色“方言”，才能帮我们补全正确的SQL语句。
 
 <img src="MyBatis.2022.02.12/data-source.png" alt="data-source" style="zoom:67%;" />

@@ -1256,7 +1256,7 @@ public interface UserMapper {
 **关于DriverManagerDataSource**
 
 * 数据源可以是任意的。
-* 这里我们选择Spring JDBC的DriverManagerDataSource，无连接池功能；你也可以选择Spring JDBC或其他厂商的支持连接池功能的数据源。
+* 这里我们选择Spring JDBC的DriverManagerDataSource，无连接池功能；你也可以选择其他厂商的支持连接池功能的数据源。
 
 **关于SqlSessionFactoryBean**
 
@@ -1371,7 +1371,7 @@ User{id=7, name='name777', pwd='pwd777'}
 User{id=8, name='name8', pwd='pwd8'}
 ```
 
-#### 9.2.8 另一种实现方式
+#### 9.2.8 在实现类中获取SqlSession实例的另一种方式
 
 https://mybatis.org/spring/zh/sqlsession.html#SqlSessionDaoSupport
 

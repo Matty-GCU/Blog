@@ -46,6 +46,8 @@ date: 2022-04-05 19:45:00
 * **Spring Web MVC 5.3.18**
 * JDK 11
 * Tomcat 9
+* IDEA 2021.1.3
+* Maven 3.8.4
 
 ## 一. 简介
 
@@ -257,6 +259,8 @@ Spring MVC是Spring提供的一个实现了**Web MVC设计模式**的**轻量级
 
 ### 1.5 为什么要学Spring MVC
 
+> [狂神说SpringMVC01：什么是SpringMVC](https://mp.weixin.qq.com/s/yuQqZzAsCefk9Jv_kbh_eA)
+>
 > Spring MVC的特点：
 >
 > 1. 轻量级，简单易学
@@ -381,7 +385,7 @@ Spring的web框架围绕DispatcherServlet（调度Servlet）设计，其主要�
 
     <servlet-mapping>
         <servlet-name>springmvc</servlet-name>
-        <!-- url-pattern的匹配优先级是精确匹配（/login.html）、路径匹配（/*）、扩展名匹配（/*.html）、缺省匹配（/） -->
+        <!-- url-pattern的匹配优先级是精确匹配（/login.html）、路径匹配（/*）、扩展名匹配（*.html）、缺省匹配（/） -->
         <!-- 在这个例子中，虽然没有显示声明其他更高优先级的url匹配方式，但是由于servlet容器中有内置的“*.jsp”匹配器，而扩展名匹配的优先级高于缺省匹配，
         所以这里的“/”无法匹配带有.jsp后缀的请求，当然，除此之外的请求都可以。 -->
         <url-pattern>/</url-pattern>
@@ -392,8 +396,8 @@ Spring的web框架围绕DispatcherServlet（调度Servlet）设计，其主要�
 
 ##### 关于\<load-on-startup\>
 
-[servlet配置load-on-startup的作用_xuke6677的博客-CSDN博客_loadonstartup servlet](https://blog.csdn.net/xuke6677/article/details/44752207)
-
+> [servlet配置load-on-startup的作用_xuke6677的博客-CSDN博客_loadonstartup servlet](https://blog.csdn.net/xuke6677/article/details/44752207)
+>
 > 在servlet的配置当中，\<load-on-startup\>1\</load-on-startup\>的含义是：
 >
 > 标记容器是否在启动的时候就加载这个servlet。
@@ -404,15 +408,15 @@ Spring的web框架围绕DispatcherServlet（调度Servlet）设计，其主要�
 >
 > 正数的值越小，启动该servlet的优先级越高。
 >
->   如果我们在web.xml中设置了多个servlet的时候，可以使用load-on-startup来指定servlet的加载顺序，服务器会根据load-on-startup的大小依次对servlet进行初始化。不过即使我们将load-on-startup设置重复也不会出现异常，服务器会自己决定初始化顺序。
+> 如果我们在web.xml中设置了多个servlet的时候，可以使用load-on-startup来指定servlet的加载顺序，服务器会根据load-on-startup的大小依次对servlet进行初始化。不过即使我们将load-on-startup设置重复也不会出现异常，服务器会自己决定初始化顺序。
 >
 > 配置load-on-startup后，servlet在startup后立即加载，但只是调用servlet的init()方法，用以初始化该servlet相关的资源。初始化成功后，该servlet可响应web请求；如未配置load-on-startup，容器一般在第一次响应web请求时，会先检测该servlet是否初始化，如未初始化，则调用servlet的init()先初始化，初始化成功后，再响应请求。
 > PS：一般我们在开发web应用时，都会配置这个参数，有两个好处：1、如果初始化过程失败，则容器会提示启动失败，此时我们能够提前知道相关错误；2、配置该参数相当于将初始化servlet的工作转移到容器启动过程，使得容器只要启动成功后，就可立即响应web请求。
 
 ##### 关于\<url-pattern\>
 
-[servlet的url-pattern匹配规则 - canger - 博客园](https://www.cnblogs.com/canger/p/6084846.html)
-
+> [servlet的url-pattern匹配规则 - canger - 博客园](https://www.cnblogs.com/canger/p/6084846.html)
+>
 > 首先需要明确几容易混淆的规则：
 >
 > 1. servlet容器中的匹配规则既不是简单的通配，也不是正则表达式，而是特定的规则。所以不要用通配符或者正则表达式的匹配规则来看待servlet的url-pattern。
@@ -429,6 +433,22 @@ Spring的web框架围绕DispatcherServlet（调度Servlet）设计，其主要�
 > 2. 路径匹配，先最长路径匹配，再最短路径匹配servlet-mapping1：\<url-pattern\>/user/\*</url-pattern\>，servlet-mapping2：\<url-pattern\>/*\</url-pattern\>。当一个请求`http://localhost:8080/appDemo/user/users.html`来的时候，servlet-mapping1匹配到，不再用servlet-mapping2匹配
 > 3. 扩展名匹配，servlet-mapping1：\<url-pattern\>/user/\*</url-pattern\>，servlet-mapping2：\<url-pattern\>*.action\</url-pattern\>。当一个请求`http://localhost:8080/appDemo/user/addUser.action`来的时候，servlet-mapping1匹配到，不再用servlet-mapping2匹配
 > 4. 缺省匹配，以上都找不到servlet，就用默认的servlet，配置为\<url-pattern\>/\</url-pattern\>
+>
+> ## 三、需要注意的问题
+>
+> ### 1 路径匹配和扩展名匹配无法同时设置
+>
+> 　　匹配方法只有三种，要么是路径匹配（**以“/”字符开头，并以“/\*”结尾**），要么是扩展名匹配（**以“\*.”开头**），要么是精确匹配，三种匹配方法不能进行组合，不要想当然使用通配符或正则规则。
+>
+> 　　如\<url-pattern\>/user/*.action\</url-pattern\>是非法的
+>
+> 　　另外注意：\<url-pattern\>/aa/*/bb\</url-pattern\>是精确匹配，合法，这里的\*不是通配的含义
+>
+> ### 2 "/*"和"/"含义并不相同
+>
+> - “/*”属于路径匹配，并且可以匹配所有request，由于路径匹配的优先级仅次于精确匹配，所以“/*”会覆盖所有的扩展名匹配，很多404错误均由此引起，所以这是一种特别恶劣的匹配模式，一般只用于filter的url-pattern
+> - “/”是servlet中特殊的匹配模式，切该模式有且仅有一个实例，优先级最低，不会覆盖其他任何url-pattern，只是会替换servlet容器的内建default servlet ，该模式同样会匹配所有request。
+> - 配置“/”后，一种可能的现象是myServlet会拦截诸如`http://localhost:8080/appDemo/user/addUser.action`、`http://localhost:8080/appDemo/user/updateUser`的格式的请求，但是并不会拦截`http://localhost:8080/appDemo/user/users.jsp`、`http://localhost:8080/appDemo/index.jsp`，这是应为servlet容器有内置的“*.jsp”匹配器，而扩展名匹配的优先级高于缺省匹配，所以才会有上述现象。
 >
 > ...
 
@@ -499,7 +519,7 @@ Ctrl+Shift+Alt+S唤出Project Structure窗口，查看Project Settings->Artifact
 
 注意servlet相关的jar包其实Tomcat容器里是自带了的，我们将其导入Maven项目只是为了方便编译、测试。
 
-但是springmvc相关的jar包，Tomcat容器里是没有的，所以我们需要导出相关jar包到Artifact中，这样在运行期才能用到它们。
+但是springmvc相关的jar包，Tomcat容器里是没有的，所以我们需要导入相关jar包到项目的Artifact中，这样在运行期才能用到它们。
 
 **解决方案：**
 
@@ -529,8 +549,8 @@ Ctrl+Shift+Alt+S唤出Project Structure窗口，查看Project Settings->Artifact
 
 所以这里的原理讲解要参考下面这位大佬的博客，看完豁然开朗。
 
-[SpringMVC 工作原理详解 - Y.yang - 博客园](https://www.cnblogs.com/yoci/p/10642493.html#:~:text=MVC%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%9B%BE%E5%A6%82%E4%B8%8B%EF%BC%9A%20SpringMVC%20%E6%A1%86%E6%9E%B6%E6%98%AF%E4%BB%A5%E8%AF%B7%E6%B1%82%E4%B8%BA%E9%A9%B1%E5%8A%A8%EF%BC%8C%E5%9B%B4%E7%BB%95,Servlet%20%E8%AE%BE%E8%AE%A1%EF%BC%8C%E5%B0%86%E8%AF%B7%E6%B1%82%E5%8F%91%E7%BB%99%E6%8E%A7%E5%88%B6%E5%99%A8%EF%BC%8C%E7%84%B6%E5%90%8E%E9%80%9A%E8%BF%87%E6%A8%A1%E5%9E%8B%E5%AF%B9%E8%B1%A1%EF%BC%8C%E5%88%86%E6%B4%BE%E5%99%A8%E6%9D%A5%E5%B1%95%E7%A4%BA%E8%AF%B7%E6%B1%82%E7%BB%93%E6%9E%9C%E8%A7%86%E5%9B%BE%E3%80%82%20%E5%85%B6%E4%B8%AD%E6%A0%B8%E5%BF%83%E7%B1%BB%E6%98%AF%20DispatcherServlet%EF%BC%8C%E5%AE%83%E6%98%AF%E4%B8%80%E4%B8%AA%20Servlet%EF%BC%8C%E9%A1%B6%E5%B1%82%E6%98%AF%E5%AE%9E%E7%8E%B0%E7%9A%84Servlet%E6%8E%A5%E5%8F%A3%E3%80%82)
-
+> [SpringMVC 工作原理详解 - Y.yang - 博客园](https://www.cnblogs.com/yoci/p/10642493.html#:~:text=MVC%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%9B%BE%E5%A6%82%E4%B8%8B%EF%BC%9A%20SpringMVC%20%E6%A1%86%E6%9E%B6%E6%98%AF%E4%BB%A5%E8%AF%B7%E6%B1%82%E4%B8%BA%E9%A9%B1%E5%8A%A8%EF%BC%8C%E5%9B%B4%E7%BB%95,Servlet%20%E8%AE%BE%E8%AE%A1%EF%BC%8C%E5%B0%86%E8%AF%B7%E6%B1%82%E5%8F%91%E7%BB%99%E6%8E%A7%E5%88%B6%E5%99%A8%EF%BC%8C%E7%84%B6%E5%90%8E%E9%80%9A%E8%BF%87%E6%A8%A1%E5%9E%8B%E5%AF%B9%E8%B1%A1%EF%BC%8C%E5%88%86%E6%B4%BE%E5%99%A8%E6%9D%A5%E5%B1%95%E7%A4%BA%E8%AF%B7%E6%B1%82%E7%BB%93%E6%9E%9C%E8%A7%86%E5%9B%BE%E3%80%82%20%E5%85%B6%E4%B8%AD%E6%A0%B8%E5%BF%83%E7%B1%BB%E6%98%AF%20DispatcherServlet%EF%BC%8C%E5%AE%83%E6%98%AF%E4%B8%80%E4%B8%AA%20Servlet%EF%BC%8C%E9%A1%B6%E5%B1%82%E6%98%AF%E5%AE%9E%E7%8E%B0%E7%9A%84Servlet%E6%8E%A5%E5%8F%A3%E3%80%82)
+>
 > # 先来看一下什么是 MVC 模式
 >
 > MVC 是一种设计模式.
@@ -701,7 +721,7 @@ public class HelloControllerTwo {
 
 #### 3.2.2 实现
 
-* 在com.example.controller包下**新建RESTfulController**.java
+* **在com.example.controller包下新建RESTfulController.java**
 
 ```java
 package com.example.controller;
@@ -924,7 +944,7 @@ public class HelloControllerTwo {
 
 #### 4.1.3 return String
 
-* 新建一个**TestHelloController**.java（注意我们要访问的是**/index.jsp**，因为/WEB-INF/jsp/hello.jsp无法直接通过URL访问）
+* **新建一个TestHelloController.java**（注意我们要访问的是**/index.jsp**，因为/WEB-INF/jsp/hello.jsp无法直接通过URL访问）
 
 ```java
 package com.example.controller;
@@ -1043,7 +1063,7 @@ public String testMethod(String id){
 
 （Spring MVC的这个@RequestParam注解真的和[MyBatis中的@Param注解](https://wuhang.xyz/c460cf59.html#8-2-使用注解完成CURD)有异曲同工之妙啊）
 
-> 建议无论参数名是否相同，都使用@RequestParam注解，可以提高代码的可读性，让人一看就知道这个参数接收的是请求参数（所谓request parameter）。
+建议无论参数名是否相同，都使用@RequestParam注解，可以提高代码的可读性，让人一看就知道这个参数接收的是请求参数（所谓request parameter）。
 
 ```java
 @RequestMapping("/test") 
@@ -1081,11 +1101,33 @@ public class User {
 
 实际应用：
 
-* 在com.example.controller包下**新建ParamTestController**.java
+* **新建com.example.pojo包**
+
+* **在com.example.pojo包下新建User.java**
+
+  ```java
+  package com.example.controller.pojo;
+  
+  public class User {
+      
+      String id;
+      String name;
+      int age;
+      
+      // 无参构造
+      // 全参构造
+      // getter
+      // setter
+      // toString
+  }
+  ```
+
+* **在com.example.controller包下新建ParamTestController.java**
 
 ```java
 package com.example.controller;
 
+import com.example.controller.pojo.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -1105,35 +1147,6 @@ public class ParamTestController {
         return "forward:/index.jsp";
     }
     
-}
-
-class User {
-    
-    String id;
-    String name;
-    int age;
-    
-    //必须要有setter才能获取同名URL参数 !!!
-    public void setId(String id) {
-        this.id = id;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public void setAge(int age) {
-        this.age = age;
-    }
-    
-    @Override
-    public String toString() {
-        return "User{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
 }
 ```
 
@@ -1161,6 +1174,8 @@ class User {
 
 不常用。
 
+> [狂神说SpringMVC04：数据处理及跳转](https://mp.weixin.qq.com/s/1d_PAk2IIp-WWX2eBbU3aw)
+>
 > 就对于新手而言简单来说使用区别就是：
 >
 > Model 只有寥寥几个方法只适合用于储存数据，简化了新手对于Model对象的操作和理解；
@@ -1193,7 +1208,7 @@ class User {
 
 如果还是解决不了，可以使用大佬（先人）写的功能更为强大的过滤器，并把它配置到web.xml中。
 
-> 下面这个代码是狂神提供的，但并不是他的原创。
+> 下面这个代码是狂神在[狂神说SpringMVC04：数据处理及跳转](https://mp.weixin.qq.com/s/1d_PAk2IIp-WWX2eBbU3aw)提供的，但并不是他的原创。
 
 ```java
 import javax.servlet.*;
@@ -1305,3 +1320,757 @@ class MyRequest extends HttpServletRequestWrapper {
 ```
 
 ## 八. JSON
+
+### 8.1 什么是JSON？
+
+在前后端分离的时代，
+
+* 后端独立部署后端，通过提供接口来向前端提供数据
+* 前端独立部署前端，负责渲染从后端接口获得的数据
+
+前后端虽然解耦，但也需要交互，而这时候就需要有一种**通用的数据交换格式**，即JSON。
+
+如何做到“通用”二字？那就是基于纯文本，这样就可以无视编程语言的差异。
+
+> [狂神说SpringMVC06：Json交互处理](https://mp.weixin.qq.com/s/RAqRKZJqsJ78HRrJg71R1g)
+>
+> > 什么是JSON？
+>
+> - JSON(JavaScript Object Notation, JS 对象标记) 是一种轻量级的数据交换格式，目前使用特别广泛。
+> - 采用完全独立于编程语言的**文本格式**来存储和表示数据。
+> - 简洁和清晰的层次结构使得 JSON 成为理想的数据交换语言。
+> - 易于人阅读和编写，同时也易于机器解析和生成，并有效地提升网络传输效率。
+>
+> 在 JavaScript 语言中，一切都是对象。因此，任何JavaScript 支持的类型都可以通过 JSON 来表示，例如字符串、数字、对象、数组等。看看他的要求和语法格式：
+>
+> - 对象表示为键值对，数据由逗号分隔
+> - 花括号保存对象
+> - 方括号保存数组
+>
+> **JSON 键值对**是用来保存 JavaScript 对象的一种方式，和 JavaScript 对象的写法也大同小异，键/值对组合中的键名写在前面并用双引号 "" 包裹，使用冒号 : 分隔，然后紧接着值：
+>
+> ```json
+> {"name": "QinJiang"}
+> {"age": "3"}
+> {"sex": "男"}
+> ```
+>
+> 很多人搞不清楚 JSON 和 JavaScript 对象的关系，甚至连谁是谁都不清楚。其实，可以这么理解：
+>
+> JSON 是 JavaScript 对象的字符串表示法，它使用文本表示一个 JS 对象的信息，本质是一个字符串。
+>
+> ```javascript
+> var obj = {a: 'Hello', b: 'World'}; //这是一个对象，注意键名也是可以使用引号包裹的
+> var json = '{"a": "Hello", "b": "World"}'; //这是一个 JSON 字符串，本质是一个字符串
+> ```
+
+### 8.2 JSON字符串与JS对象的转换
+
+> [狂神说SpringMVC06：Json交互处理](https://mp.weixin.qq.com/s/RAqRKZJqsJ78HRrJg71R1g)
+>
+> **JSON 和 JavaScript 对象互转**
+>
+> 要实现从JSON字符串转换为JavaScript 对象，使用 JSON.parse() 方法：
+>
+> ```javascript
+> var obj = JSON.parse('{"a": "Hello", "b": "World"}');
+> //结果是 {a: 'Hello', b: 'World'}
+> ```
+>
+> 要实现从JavaScript 对象转换为JSON字符串，使用 JSON.stringify() 方法：
+>
+> ```javascript
+> var json = JSON.stringify({a: 'Hello', b: 'World'});
+> //结果是 '{"a": "Hello", "b": "World"}'
+> ```
+
+我们直接在浏览器控制台里运行JS代码，测试一下：
+
+```javascript
+let jsObj = JSON.parse('{"a": "Hello", "b": "World"}');
+let jsonStr = JSON.stringify({a: 'Hello', b: 'World'});
+console.log(jsObj);
+console.log(jsonStr);
+```
+
+![json字符串与js对象互转](SpringMVC/json字符串与js对象互转.png)
+
+### 8.3 Controller返回JSON格式数据
+
+目的：在后端**将Java对象转换成JSON格式的字符串**（以后把“JSON格式的字符串”简称为“JSON”即可），并提供接口。
+
+实现方式：手写toString方法进行转换，也可以使用第三方工具，比如Jackson、Fastjson和GSON等等。
+
+```xml
+<!-- 以下依赖均为当前最新版本（截止至2022.04.17） -->
+<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.13.2.2</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>fastjson</artifactId>
+    <version>1.2.80</version>
+</dependency>
+```
+
+#### 8.3.1 先从toString()开始
+
+* **在com.example.controller.json包下新建ToStringTestController.java**：
+
+  ```java
+  package com.example.controller.json;
+  
+  import com.example.controller.pojo.User;
+  import org.springframework.stereotype.Controller;
+  import org.springframework.web.bind.annotation.RequestMapping;
+  import org.springframework.web.bind.annotation.ResponseBody;
+  
+  @Controller
+  @RequestMapping("/json1")
+  public class ToStringTestController {
+      
+      @RequestMapping("/test1")
+      @ResponseBody
+      public String test1() {
+          // 关于@ResponseBody：（简单来说就是返回值不会被当作视图进行解析，而是直接作为返回内容）
+          // Annotation that indicates a method return value should be bound to the web response body.
+          return "111";
+      }
+      
+      @RequestMapping("/test2")
+      @ResponseBody
+      public String test2() {
+          User user = new User("1", "wuhang", 18);
+          // 其实我们将user对象直接用toString方法转换成这样的字符串，也是符合JSON格式的
+          return user.toString();
+      }
+      
+  }
+  ```
+
+* 访问测试
+
+  * 访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/json1/test1`，页面显示`111`
+  * 访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/json1/test2`，页面显示`User{id='1', name='wuhang', age=18}`
+
+##### 关于@ResponseBody注解
+
+可以标注在处理器的方法上，自Spring 4.0以后也可以标注在类上（此时该类的所有方法都相当于标注了该注解）。
+
+```java
+/**
+ * Annotation that indicates a method return value should be bound to the web
+ * response body. Supported for annotated handler methods.
+ *
+ * <p>As of version 4.0 this annotation can also be added on the type level in
+ * which case it is inherited and does not need to be added on the method level.
+ *
+ * @author Arjen Poutsma
+ * @since 3.0
+ * @see RequestBody
+ * @see RestController
+ */
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface ResponseBody {
+}
+```
+
+##### 关于@RestController注解
+
+如果将@ResponseBody注解标注在处理器类（被@Ccontroller注解标注）上，那么可以直接使用@RestController注解，合二为一！
+
+```java
+/**
+ * A convenience annotation that is itself annotated with
+ * {@link Controller @Controller} and {@link ResponseBody @ResponseBody}.
+ * <p>
+ * Types that carry this annotation are treated as controllers where
+ * {@link RequestMapping @RequestMapping} methods assume
+ * {@link ResponseBody @ResponseBody} semantics by default.
+ * 
+ * ...
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Controller
+@ResponseBody
+public @interface RestController {
+	...
+}
+```
+
+##### JSON乱码问题解决
+
+**发现问题：**
+
+如果将前面ToStringTestController的test2方法的User对象的name，改成包含中文的，
+
+```java
+User user = new User("1", "English Test & 中文测试", 18);
+```
+
+返回的JSON数据就会出现乱码，
+
+访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/json1/test2`，页面显示`User{id='1', name='English Test & ????', age=18}`。
+
+**debug：**
+
+![json乱码问题debug](SpringMVC/json乱码问题debug.png)
+
+###### 解决方案1
+
+给ToStringTestController的**@RequestMapping**注解传入一个**produce**参数，
+
+```java
+@Controller
+@RequestMapping(value = "/json1", produces = "application/json;charset=utf-8")
+public class ToStringTestController {
+    ...
+}
+```
+
+再次访问，问题解决！
+
+![json乱码问题成功解决](SpringMVC/json乱码问题成功解决.png)
+
+###### 解决方案2
+
+上一种方案需要在每一个Controller的@RequestMapping注解中多次配置，不够方便。
+
+我们可以使用Spring MVC自带的**消息转换器（Message Converter）**，一步到位。
+
+* 在springmvc-servlet.xml中添加下面这段配置：
+
+```xml
+<mvc:annotation-driven>
+    <!-- Configures one or more HttpMessageConverter types to use for converting @RequestBody method parameters and @ResponseBody method return values.-->
+    <mvc:message-converters>
+        <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+            <constructor-arg value="UTF-8"/>
+        </bean>
+        <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+            <property name="objectMapper">
+                <bean class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+                    <property name="failOnEmptyBeans" value="false"/>
+                </bean>
+            </property>
+        </bean>
+    </mvc:message-converters>
+</mvc:annotation-driven>
+```
+
+#### 8.3.2 使用Jackson生成JSON
+
+**导入jackson-databind依赖**
+
+```xml
+<!-- 当前最新版本（截止至2022.04.17） -->
+<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.13.2.2</version>
+</dependency>
+```
+
+注意在pom.xml中导入依赖后，还要像2.1.8一样，导入相关jar包到项目的Artifact中。
+
+**在com.example.controller.json包下新建JacksonTestController.java**
+
+```java
+package com.example.controller.json;
+
+import com.example.controller.pojo.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+//@Controller
+//@ResponseBody
+// 上面这两个注解可以“合二为一”，用一个@RestController注解代替
+@RestController
+@RequestMapping("/json2")
+public class JacksonTestController {
+    
+    /**
+     * 普通对象转换
+     */
+    @RequestMapping("/test1")
+    public String test1() throws JsonProcessingException {
+        User user = new User("1", "Wick", 35);
+        ObjectMapper objectMapper = new ObjectMapper();
+        // 关于String writeValueAsString(Object value)方法：
+        // Method that can be used to serialize any Java value as a String.
+        // 一句话：通过【序列化】将Java对象转化为纯字符串！
+        String s = objectMapper.writeValueAsString(user);
+        return s;
+    }
+    
+    /**
+     * 集合对象转换
+     */
+    @RequestMapping("/test2")
+    public String test2() throws JsonProcessingException {
+        List<User> userList = new ArrayList<>();
+        User user1 = new User("1", "John", 35);
+        User user2 = new User("2", "Wick", 35);
+        User user3 = new User("3", "John Wick", 35);
+        User user4 = new User("4", "Baba Yaga", 35);
+        userList.add(user1);
+        userList.add(user2);
+        userList.add(user3);
+        userList.add(user4);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String s = objectMapper.writeValueAsString(userList);
+        return s;
+    }
+    
+    /**
+     * 日期对象转换
+     */
+    @RequestMapping("/test3")
+    public String test3() throws JsonProcessingException {
+        Date date = new Date();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.WRITE_DATES_WITH_ZONE_ID, true);
+        
+        // 若objectMapper没有设置DateFormat，得到的会是时间戳(timestamp)格式的数据，等同于下面两行代码的输出：
+        // System.out.println(date.getTime());
+        // System.out.println(System.currentTimeMillis());
+    
+        // 注意MM是月份，mm是分钟；HH是24小时制的小时，hh是12小时制的小时
+        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+        String s = objectMapper.writeValueAsString(date);
+        return s;
+    }
+}
+```
+
+**测试**
+
+访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/json2/test1`，页面显示
+
+```html
+{"id":"1","name":"Wick","age":35}
+```
+
+访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/json2/test2`，页面显示
+
+```html
+[{"id":"1","name":"John","age":35},{"id":"2","name":"Wick","age":35},{"id":"3","name":"John Wick","age":35},{"id":"4","name":"Baba Yaga","age":35}]
+```
+
+访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/json2/test3`，页面显示
+
+```html
+"2022-04-17 13:29:00"
+```
+
+#### 8.3.3 使用Fastjson生成JSON
+
+[Quick Start CN · alibaba/fastjson Wiki](https://github.com/alibaba/fastjson/wiki/Quick-Start-CN)
+
+> ## 1. 什么是fastjson?
+>
+> fastjson是阿里巴巴的开源JSON解析库，它可以解析JSON格式的字符串，支持将Java Bean序列化为JSON字符串，也可以从JSON字符串反序列化到JavaBean。
+>
+> ## 2.fastjson的优点
+>
+> ### 2.1 速度快
+>
+> fastjson相对其他JSON库的特点是快，从2011年fastjson发布1.1.x版本之后，其性能从未被其他Java实现的JSON库超越。
+>
+> ### 2.2 使用广泛
+>
+> fastjson在阿里巴巴大规模使用，在数万台服务器上部署，fastjson在业界被广泛接受。在2012年被开源中国评选为最受欢迎的国产开源软件之一。
+>
+> ### 2.3 测试完备
+>
+> fastjson有非常多的testcase，在1.2.11版本中，testcase超过3321个。每次发布都会进行回归测试，保证质量稳定。
+>
+> ### 2.4 使用简单
+>
+> fastjson的API十分简洁。
+>
+> ```
+> String text = JSON.toJSONString(obj); //序列化
+> VO vo = JSON.parseObject("{...}", VO.class); //反序列化
+> ```
+>
+> ### 2.5 功能完备
+>
+> 支持泛型，支持流处理超大文本，支持枚举，支持序列化和反序列化扩展。
+
+**同样先导入fastjson依赖**
+
+```xml
+<!-- 当前最新版本（截止至2022.04.17） -->
+<!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>fastjson</artifactId>
+    <version>1.2.80</version>
+</dependency>
+```
+
+同样注意在pom.xml中导入依赖后，还要像2.1.8一样，导入相关jar包到项目的Artifact中。
+
+**同样在com.example.controller.json包下新建FastjsonTestController.java**
+
+```java
+package com.example.controller.json;
+
+import com.alibaba.fastjson.JSONObject;
+import com.example.controller.pojo.User;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * 实现与JacksonTestController一模一样的功能，看看用Fastjson在实现上会有什么区别
+ */
+@RestController
+@RequestMapping("/json3")
+public class FastJsonTestController {
+    
+    /**
+     * 普通对象转换
+     */
+    @RequestMapping("/test1")
+    public String test1() {
+        User user = new User("1", "Wick", 35);
+        String s = JSONObject.toJSONString(user);
+        return s;
+    }
+    
+    /**
+     * 集合对象转换
+     */
+    @RequestMapping("/test2")
+    public String test2() {
+        List<User> userList = new ArrayList<>();
+        User user1 = new User("1", "John", 35);
+        User user2 = new User("2", "Wick", 35);
+        User user3 = new User("3", "John Wick", 35);
+        User user4 = new User("4", "Baba Yaga", 35);
+        userList.add(user1);
+        userList.add(user2);
+        userList.add(user3);
+        userList.add(user4);
+        String s = JSONObject.toJSONString(userList);
+        return s;
+    }
+    
+    /**
+     * 日期对象转换
+     */
+    @RequestMapping("/test3")
+    public String test3() {
+        Date date = new Date();
+        String s = JSONObject.toJSONString(date);
+        return s;
+    }
+}
+```
+
+数据返回结果与JacksonTestController完全一致。
+
+## 九. SSM框架整合（经典）
+
+终于到了这一步！
+
+### 9.1 准备数据库环境
+
+创建一个存放书籍信息的数据库表。
+
+```sql
+create database if not exists springmvc_test;
+use springmvc_test;
+
+drop table if exists books;
+create table books (
+    id int primary key auto_increment comment '编号',
+    title varchar(50) not null comment '书名',
+    number int not null comment '数量',
+    introduction varchar(200) not null comment '简介'
+)engine = innodb default charset = utf8;
+```
+
+### 9.2 新建项目`springmvc-03-ssm`
+
+不选用任何archetype，不添加任何Framework Support，就是新建一个纯粹的Maven项目。
+
+### 9.3 导入SSM相关依赖
+
+捋一下思路先……我们总共需要哪些包？
+
+* 数据库驱动、数据库连接池
+* mybatis、mybatis-spring
+
+* spring-jdbc、springwebmvc、servlet（编译时）
+* junit、lombok
+
+```xml
+<dependencies>
+    <!-- 数据库驱动与本机的数据库版本保持一致 -->
+    <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>8.0.26</version>
+    </dependency>
+
+    <!-- 以下依赖均为当前最新版本（截止至2022.04.17） -->
+    <!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
+    <dependency>
+        <groupId>com.mchange</groupId>
+        <artifactId>c3p0</artifactId>
+        <version>0.9.5.5</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
+    <dependency>
+        <groupId>org.mybatis</groupId>
+        <artifactId>mybatis</artifactId>
+        <version>3.5.9</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.mybatis/mybatis-spring -->
+    <dependency>
+        <groupId>org.mybatis</groupId>
+        <artifactId>mybatis-spring</artifactId>
+        <version>2.0.7</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-jdbc</artifactId>
+        <version>5.3.19</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>5.3.19</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>4.0.1</version>
+        <scope>provided</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>5.8.2</version>
+        <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.18.22</version>
+        <scope>provided</scope>
+    </dependency>
+</dependencies>
+```
+
+### 9.4 预防Maven资源过滤问题TODO
+
+```xml
+<build>
+    <resources>
+        <resource>
+            <directory>src/main/java</directory>
+            <includes>
+                <include>**/*.properties</include>
+                <include>**/*.xml</include>
+            </includes>
+        </resource>
+    </resources>
+</build>
+```
+
+### 9.5 建立项目基本结构
+
+* 新建org.example.pojo
+
+* 新建org.example.dao
+
+* 新建org.example.service
+
+* 新建org.example.controller
+
+* 新建mybatis-config.xml
+
+  ```xml
+  <?xml version="1.0" encoding="UTF-8" ?>
+  <!DOCTYPE configuration
+          PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+          "http://mybatis.org/dtd/mybatis-3-config.dtd">
+  <configuration>
+  
+  </configuration>
+  ```
+
+* 新建applicationContext.xml
+
+  ```xml
+  <?xml version="1.0" encoding="UTF-8"?>
+  <beans xmlns="http://www.springframework.org/schema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+  
+  </beans>
+  ```
+
+![SSM目录结构](SpringMVC/SSM目录结构.png)
+
+### 9.6 MyBatis层
+
+* 新建db.properties
+
+  ```properties
+  driver=com.mysql.cj.jdbc.Driver
+  url=jdbc:mysql://localhost:3306
+  username=root
+  password=123456
+  ```
+
+* 新建User.java
+
+  ```java
+  package org.example.pojo;
+  
+  import lombok.AllArgsConstructor;
+  import lombok.Data;
+  import lombok.NoArgsConstructor;
+  
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public class Book {
+      
+      private int id;
+      private String title;
+      private int number;
+      private String introduction;
+      
+  }
+  ```
+
+* 在mybatis-config.xml设置类型别名
+
+  ```xml
+  <typeAliases>
+      <package name="org.example.pojo"/>
+  </typeAliases>
+  ```
+
+* 新建BookMapper.java
+
+  ```java
+  package org.example.dao;
+  
+  import org.example.pojo.Book;
+  
+  import java.util.List;
+  
+  public interface BookMapper {
+      
+      /**
+       * 增加一本书
+       */
+      int insertBook(Book book);
+      
+      /**
+       * 删除一本书
+       */
+      int deleteBookById(int id);
+      
+      /**
+       * 更新一本书
+       */
+      int updateBookById(Book book);
+      
+      /**
+       * 查询一本书
+       */
+      Book selectBookById(int id);
+      
+      /**
+       * 查询所有书
+       */
+      List<Book> selectAllBooks();
+  }
+  ```
+
+* 新建BookMapper.xml
+
+  ```xml
+  <?xml version="1.0" encoding="UTF-8" ?>
+  <!DOCTYPE mapper
+          PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="org.example.dao.BookMapper">
+  
+      <insert id="insertBook" parameterType="Book">
+          insert into springmvc_test.books(title, number, introduction) VALUES (#{title}, #{number}, #{introduction});
+      </insert>
+  
+      <delete id="deleteBookById" parameterType="_int">
+          delete from springmvc_test.books where id = #{id};
+      </delete>
+  
+      <update id="updateBookById" parameterType="Book">
+          update springmvc_test.books set title = #{title}, number = #{number}, introduction = #{introduction} where id = #{id};
+      </update>
+  
+      <select id="selectBookById" parameterType="_int" resultType="Book">
+          select * from springmvc_test.books where id = #{id};
+      </select>
+  
+      <select id="selectAllBooks" resultType="Book">
+          select * from springmvc_test.books;
+      </select>
+  </mapper>
+  ```
+
+* 在mybatis-config.xml注册映射器
+
+  ```xml
+  <mappers>
+      <mapper class="org.example.dao"/>
+  </mappers>
+  ```
+
+### 9.7 Spring层TODO
+
+* 写一下都新建了什么文件和类
+
+* spring-dao.xml
+
+* spring-service.xml
+
+* org.example.service包的接口、接口实现类、接口实现类测试类
+
+  
