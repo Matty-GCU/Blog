@@ -7,6 +7,7 @@ tags:
 	- SSM
 	- Spring MVC
 	- RESTful
+	- Bootstrap
 categories:
   - Java
   - JavaEE
@@ -17,14 +18,6 @@ date: 2022-04-05 19:45:00
 ---
 
 # Spring MVC学习笔记
-
-## TODO
-
-补充一个SpringMVC静态资源访问问题的总结！
-
-* script标签引入后不能直接用，要在下一个用
-* js放在WEB-INF目录下访问不到（其实它好像是作为InternalResource内部资源）。放在这是否有必要？如何访问？
-* 控制台查看所有响应内容
 
 ## 零. 前言
 
@@ -702,7 +695,6 @@ public class HelloControllerTwo {
     <context:component-scan base-package="com.example.controller"/>
 
     <!-- 使用Web容器默认的Servlet来处理对静态资源的请求，用于解决【静态资源访问】的问题 -->
-    <!-- 但是说实话我没有成功解决过这个问题，所以这里也算是一个TODO吧 -->
     <mvc:default-servlet-handler/>
 
     <!-- 支持SpringMVC注解驱动 -->
@@ -716,8 +708,6 @@ public class HelloControllerTwo {
 ```
 
 关于\<mvc:default-servlet-handler/\>：[SPRING-MVC访问静态文件,如jpg,js,css - LuisZach's Blog - ITeye博客](https://www.iteye.com/blog/lzy83925-1186609)
-
-关于\<mvc:annotation-driven/\>：
 
 **重新发布运行**：
 
@@ -1813,7 +1803,7 @@ public class FastJsonTestController {
 
 数据返回结果与JacksonTestController完全一致。
 
-## 九. SSM框架整合（经典）
+## 九. SSM框架整合（经典&入门）
 
 终于到了这一步！
 
@@ -2502,7 +2492,7 @@ class BookServiceImplTest {
 </beans>
 ```
 
-#### 9.7.3 在applicationContext.xml导入其他Spring配置文件
+#### 9.7.3 applicationContext.xml
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -2515,7 +2505,7 @@ class BookServiceImplTest {
 </beans>
 ```
 
-到这里其实SSM框架的“整合”就已经完成了。
+到了这一步，SSM框架的“整合”工作基本上就已经完成了！剩下的就是纯写代码啦。
 
 #### 9.7.4 新建BookController.java
 
@@ -2574,11 +2564,153 @@ public class BookController {
 
 ![SSM整合初步完成时项目结构](SpringMVC/SSM整合初步完成时项目结构.png)
 
-### 9.8 层面的完善
+### 9.8 完善controller层并完成前端部分
 
-接下来我们就可以实现其他CRUD操作以及完成前端的简单美化
+接下来我们就可以在controller层实现其他CRUD操作，并完成前端部分，再使用Bootstrap美化前端页面。
 
-改index.jsp
+直接贴代码：
 
-新建queryResult.jsp
+* index.jsp
 
+  ```jsp
+  <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+  <html>
+    <head>
+      <title>$Title$</title>
+      <meta charset="UTF-8">
+      <!-- Bootstrap 的 CSS 文件 -->
+      <%-- https://v4.bootcss.com/docs/getting-started/introduction/ --%>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    </head>
+    <body>
+      <%-- https://v4.bootcss.com/docs/components/buttons/ --%>
+      <a class="btn btn-primary btn-lg btn-block" href="${pageContext.request.contextPath}/books">查询所有书籍</a>
+    </body>
+  </html>
+  ```
+
+* WEB-INF/jsp/books.jsp
+
+  ```jsp
+  <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+  <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+  <html>
+  <head>
+      <title>Title</title>
+      <meta charset="UTF-8">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+  </head>
+  <body>
+      <%-- https://v4.bootcss.com/docs/layout/overview/ --%>
+      <div class="container">
+  
+          <%-- https://v4.bootcss.com/docs/components/jumbotron/ --%>
+          <div class="jumbotron jumbotron-fluid">
+              <div class="container">
+                  <h1 class="display-4">所有书籍</h1>
+              </div>
+          </div>
+  
+          <%-- https://v4.bootcss.com/docs/content/tables/#table-head-options --%>
+          <table class="table">
+              <%-- table head --%>
+              <thead class="thead-dark">
+                  <%-- table row --%>
+                  <tr>
+                      <%-- table header --%>
+                      <th scope="col">编号</th>
+                      <th scope="col">书名</th>
+                      <th scope="col">数量</th>
+                      <th scope="col">简介</th>
+                      <th scope="col">操作</th>
+                  </tr>
+              </thead>
+              <%-- table body --%>
+              <tbody>
+                  <c:forEach var="book" items="${bookList}">
+                      <tr>
+                          <th scope="row">${book.getId()}</th>
+                          <%-- table data --%>
+                          <td>${book.getTitle()}</td>
+                          <td>${book.getNumber()}</td>
+                          <td>${book.getIntroduction()}</td>
+                          <td>
+                              <%-- https://v4.bootcss.com/docs/components/buttons/ --%>
+                              <a class="btn btn-primary" href="${pageContext.request.contextPath}/books/toUpdateBookForm?id=${book.getId()}" role="button">修改</a>
+                              <a class="btn btn-danger" href="${pageContext.request.contextPath}/books/delete?id=${book.getId()}" role="button">删除</a>
+                          </td>
+                      </tr>
+                  </c:forEach>
+              </tbody>
+          </table>
+  
+          <a class="btn btn-info btn-lg btn-block" href="${pageContext.request.contextPath}/books/toAddBookForm">添加书籍</a>
+      </div>
+  </body>
+  </html>
+  ```
+
+* WEB-INF/jsp/addBookForm.jsp
+
+  ```jsp
+  <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+  <html>
+  <head>
+      <title>Title</title>
+      <meta charset="UTF-8">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+  </head>
+  <body>
+      <div class="container">
+          <div class="jumbotron jumbotron-fluid">
+              <div class="container">
+                  <h1 class="display-4">新增书籍</h1>
+              </div>
+          </div>
+          <%-- https://v4.bootcss.com/docs/components/forms/ --%>
+          <form class="form" action="${pageContext.request.contextPath}/books" method="post">
+              <div class="form-group">
+                  <label>编号</label>
+                  <%-- https://v4.bootcss.com/docs/components/forms/#readonly --%>
+                  <input class="form-control" class="form-control" type="text" value="id为自增字段，无法指定id" readonly>
+              </div>
+              <div class="form-group">
+                  <label>书名</label>
+                  <input class="form-control" type="text" name="title"><br>
+              </div>
+              <div class="form-group">
+                  <label>数量</label>
+                  <input class="form-control" type="text" name="number"><br>
+              </div>
+              <div class="form-group">
+                  <label>描述</label>
+                  <input class="form-control" type="text" name="introduction">
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+      </div>
+  </body>
+  </html>
+  ```
+
+* WEB-INF/jsp/updateBookForm.jsp
+
+  基本上是照搬了addBookForm.jsp，只改动了第12、16、20行。
+
+运行演示：
+![SSM整合项目运行1](SpringMVC/SSM整合项目运行1.png)
+![SSM整合项目运行2](SpringMVC/SSM整合项目运行2.png)
+![SSM整合项目运行2](SpringMVC/SSM整合项目运行3.png)
+![SSM整合项目运行2](SpringMVC/SSM整合项目运行4.png)
+
+### 9.9 小结及展望
+
+> 狂神：
+>
+> 这个是同学们的第一个SSM整合案例，一定要烂熟于心！
+>
+> SSM框架的重要程度是不言而喻的，学到这里，大家已经可以进行基本网站的单独开发。但是这只是增删改查的基本操作。<u>***可以说学到这里，大家才算是真正的步入了后台开发的门。也就是能找一个后台相关工作的底线。***</u>
+>
+> 或许很多人，工作就做这些事情，但是对于个人的提高来说，还远远不够！
+
+## 十. ?
