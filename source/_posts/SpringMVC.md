@@ -2,6 +2,9 @@
 abbrlink: 4ec260e1
 title: Spring MVC学习笔记
 tags:
+	- Java
+	- JavaEE
+	- SSM
 	- Spring MVC
 	- RESTful
 categories:
@@ -10,9 +13,18 @@ categories:
   - SSM
   - Spring MVC
 date: 2022-04-05 19:45:00
+
 ---
 
 # Spring MVC学习笔记
+
+## TODO
+
+补充一个SpringMVC静态资源访问问题的总结！
+
+* script标签引入后不能直接用，要在下一个用
+* js放在WEB-INF目录下访问不到（其实它好像是作为InternalResource内部资源）。放在这是否有必要？如何访问？
+* 控制台查看所有响应内容
 
 ## 零. 前言
 
@@ -116,6 +128,10 @@ SSM：看官方文档，锻炼自学能力、笔记能力、项目能力
 为什么要放在WEB-INF里？因为放在**WEB-INF目录下的页面**如果不作配置一般是**无法直接通过网址访问**的。
 
 因此我们可以利用这一点，把需要经过验证（比如登录验证）才能访问的页面，都放在这个“安全目录”里；而那些不需要经过任何验证就能访问的页面（比如欢迎页），就不放在这个目录里了。
+
+> 出自org.springframework.web.servlet.view.InternalResourceViewResolver的注释：
+>
+> BTW, <u>it's good practice to put JSP files that just serve as views under WEB-INF, to hide them from direct access (e.g. via a manually entered URL). Only controllers will be able to access them then.</u>
 
 test.jsp：
 
@@ -699,7 +715,9 @@ public class HelloControllerTwo {
 </beans>
 ```
 
-> 关于【静态资源访问】的问题：[SPRING-MVC访问静态文件,如jpg,js,css - LuisZach's Blog - ITeye博客](https://www.iteye.com/blog/lzy83925-1186609)
+关于\<mvc:default-servlet-handler/\>：[SPRING-MVC访问静态文件,如jpg,js,css - LuisZach's Blog - ITeye博客](https://www.iteye.com/blog/lzy83925-1186609)
+
+关于\<mvc:annotation-driven/\>：
 
 **重新发布运行**：
 
@@ -904,6 +922,7 @@ public ModelAndView handleRequest(HttpServletRequest request, HttpServletRespons
     return modelAndView;
 }
 ```
+
 * springmvc-servlet.xml
 
 ```xml
@@ -1798,9 +1817,9 @@ public class FastJsonTestController {
 
 终于到了这一步！
 
-### 9.1 准备数据库环境
+### 9.1 准备好数据库环境
 
-创建一个存放书籍信息的数据库表。
+新建一个存放书籍信息的数据库表。
 
 ```sql
 create database if not exists springmvc_test;
@@ -1808,26 +1827,35 @@ use springmvc_test;
 
 drop table if exists books;
 create table books (
-    id int primary key auto_increment comment '编号',
+    id int primary key auto_increment comment '编号（自增）',
     title varchar(50) not null comment '书名',
     number int not null comment '数量',
     introduction varchar(200) not null comment '简介'
 )engine = innodb default charset = utf8;
+
+insert into books(title, number, introduction)
+values
+('Java', 50, '从入门到放弃'),
+('MySQL', 80, '从删库到跑路'),
+('Linux', 16, '从进门到改行');
 ```
 
 ### 9.2 新建项目`springmvc-03-ssm`
 
-不选用任何archetype，不添加任何Framework Support，就是新建一个纯粹的Maven项目。
+流程和1.3.1一样，只是项目名称不同。
+
+* 不选择任何模板
+* 添加Web应用的支持。
 
 ### 9.3 导入SSM相关依赖
 
-捋一下思路先……我们总共需要哪些包？
+捋一下思路先——我们总共需要哪些包？
 
 * 数据库驱动、数据库连接池
 * mybatis、mybatis-spring
-
-* spring-jdbc、springwebmvc、servlet（编译时）
-* junit、lombok
+* spring-jdbc、springwebmvc、servlet（provided）
+* junit（test）、lombok（provided）
+* jstl（写前端页面要用到）
 
 ```xml
 <dependencies>
@@ -1877,6 +1905,12 @@ create table books (
         <version>4.0.1</version>
         <scope>provided</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/javax.servlet/jstl -->
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>jstl</artifactId>
+        <version>1.2</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
     <dependency>
         <groupId>org.junit.jupiter</groupId>
@@ -1894,23 +1928,7 @@ create table books (
 </dependencies>
 ```
 
-### 9.4 预防Maven资源过滤问题TODO
-
-```xml
-<build>
-    <resources>
-        <resource>
-            <directory>src/main/java</directory>
-            <includes>
-                <include>**/*.properties</include>
-                <include>**/*.xml</include>
-            </includes>
-        </resource>
-    </resources>
-</build>
-```
-
-### 9.5 建立项目基本结构
+### 9.4 建立项目基本结构
 
 * 新建org.example.pojo
 
@@ -1920,7 +1938,7 @@ create table books (
 
 * 新建org.example.controller
 
-* 新建mybatis-config.xml
+* 新建mybatis-config.xml（MyBatis配置文件）
 
   ```xml
   <?xml version="1.0" encoding="UTF-8" ?>
@@ -1932,7 +1950,7 @@ create table books (
   </configuration>
   ```
 
-* 新建applicationContext.xml
+* 新建applicationContext.xml（Spring配置文件）
 
   ```xml
   <?xml version="1.0" encoding="UTF-8"?>
@@ -1945,132 +1963,622 @@ create table books (
 
 ![SSM目录结构](SpringMVC/SSM目录结构.png)
 
-### 9.6 MyBatis层
+### 9.5 MyBatis层
 
-* 新建db.properties
+#### 9.5.1 新建User.java
 
-  ```properties
-  driver=com.mysql.cj.jdbc.Driver
-  url=jdbc:mysql://localhost:3306
-  username=root
-  password=123456
-  ```
+```java
+package org.example.pojo;
 
-* 新建User.java
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-  ```java
-  package org.example.pojo;
-  
-  import lombok.AllArgsConstructor;
-  import lombok.Data;
-  import lombok.NoArgsConstructor;
-  
-  @Data
-  @AllArgsConstructor
-  @NoArgsConstructor
-  public class Book {
-      
-      private int id;
-      private String title;
-      private int number;
-      private String introduction;
-      
-  }
-  ```
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Book {
+    
+    private int id;
+    private String title;
+    private int number;
+    private String introduction;
+    
+}
+```
 
-* 在mybatis-config.xml设置类型别名
+#### 9.5.2 在mybatis-config.xml设置类型别名
 
-  ```xml
-  <typeAliases>
-      <package name="org.example.pojo"/>
-  </typeAliases>
-  ```
+```xml
+<typeAliases>
+    <package name="org.example.pojo"/>
+</typeAliases>
+```
 
-* 新建BookMapper.java
+#### 9.5.3 新建BookMapper.java
 
-  ```java
-  package org.example.dao;
-  
-  import org.example.pojo.Book;
-  
-  import java.util.List;
-  
-  public interface BookMapper {
-      
-      /**
-       * 增加一本书
-       */
-      int insertBook(Book book);
-      
-      /**
-       * 删除一本书
-       */
-      int deleteBookById(int id);
-      
-      /**
-       * 更新一本书
-       */
-      int updateBookById(Book book);
-      
-      /**
-       * 查询一本书
-       */
-      Book selectBookById(int id);
-      
-      /**
-       * 查询所有书
-       */
-      List<Book> selectAllBooks();
-  }
-  ```
+```java
+package org.example.dao;
 
-* 新建BookMapper.xml
+import org.example.pojo.Book;
 
-  ```xml
-  <?xml version="1.0" encoding="UTF-8" ?>
-  <!DOCTYPE mapper
-          PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-  <mapper namespace="org.example.dao.BookMapper">
-  
-      <insert id="insertBook" parameterType="Book">
-          insert into springmvc_test.books(title, number, introduction) VALUES (#{title}, #{number}, #{introduction});
-      </insert>
-  
-      <delete id="deleteBookById" parameterType="_int">
-          delete from springmvc_test.books where id = #{id};
-      </delete>
-  
-      <update id="updateBookById" parameterType="Book">
-          update springmvc_test.books set title = #{title}, number = #{number}, introduction = #{introduction} where id = #{id};
-      </update>
-  
-      <select id="selectBookById" parameterType="_int" resultType="Book">
-          select * from springmvc_test.books where id = #{id};
-      </select>
-  
-      <select id="selectAllBooks" resultType="Book">
-          select * from springmvc_test.books;
-      </select>
-  </mapper>
-  ```
+import java.util.List;
 
-* 在mybatis-config.xml注册映射器
+public interface BookMapper {
+    
+    /**
+     * 增加一本书
+     */
+    int insertBook(Book book);
+    
+    /**
+     * 删除一本书
+     */
+    int deleteBookById(int id);
+    
+    /**
+     * 更新一本书
+     */
+    int updateBookById(Book book);
+    
+    /**
+     * 查询一本书
+     */
+    Book selectBookById(int id);
+    
+    /**
+     * 查询所有书
+     */
+    List<Book> selectAllBooks();
+}
+```
 
-  ```xml
-  <mappers>
-      <mapper class="org.example.dao"/>
-  </mappers>
-  ```
+#### 9.5.4 新建BookMapper.xml
 
-### 9.7 Spring层TODO
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.BookMapper">
 
-* 写一下都新建了什么文件和类
+    <insert id="insertBook" parameterType="Book">
+        insert into springmvc_test.books(title, number, introduction) VALUES (#{title}, #{number}, #{introduction});
+    </insert>
 
-* spring-dao.xml
+    <delete id="deleteBookById" parameterType="_int">
+        delete from springmvc_test.books where id = #{id};
+    </delete>
 
-* spring-service.xml
+    <update id="updateBookById" parameterType="Book">
+        update springmvc_test.books set title = #{title}, number = #{number}, introduction = #{introduction} where id = #{id};
+    </update>
 
-* org.example.service包的接口、接口实现类、接口实现类测试类
+    <select id="selectBookById" parameterType="_int" resultType="Book">
+        select * from springmvc_test.books where id = #{id};
+    </select>
 
-  
+    <select id="selectAllBooks" resultType="Book">
+        select * from springmvc_test.books;
+    </select>
+</mapper>
+```
+
+#### 9.5.5 在mybatis-config.xml注册映射器
+
+```xml
+<package name="org.example.dao"/>
+```
+
+#### 9.5.6 解决Maven资源过滤问题
+
+在pom.xml中，将src/main/java目录中与其他.java文件格格不入的XXXMapper.xml文件配置为Maven资源文件，确保它能被输出到target目录的对应目录中。
+
+```xml
+<build>
+    <resources>
+        <resource>
+            <directory>src/main/java</directory>
+            <includes>
+                <!-- 将src/main/java目录中与其他.java文件格格不入的XXXMapper.xml文件配置为Maven资源文件，确保它能被输出到target目录的对应目录中。 -->
+                <include>**/*.xml</include>
+            </includes>
+        </resource>
+    </resources>
+</build>
+```
+
+### 9.6 Spring层
+
+#### 9.6.1 新建db.properties
+
+```properties
+jdbc.driver=com.mysql.cj.jdbc.Driver
+jdbc.url=jdbc:mysql://localhost:3306
+# 属性名"username"会被解析为系统管理员的名字，如果直接写username=root，运行时会报这样的错：
+# java.sql.SQLException: Access denied for user 'Matty's PC'@'localhost'
+# 所以我把"username"改成了"jdbc.username"
+# 我把这几个属性都加上"jdbc."前缀只是想显得比较规范，并不是一定要这样写，换成别的也是完全可以的，比如"myUserName=root"
+jdbc.username=root
+jdbc.password=123456
+```
+
+#### 9.6.2 新建spring-dao.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--
+    Activates replacement of ${...} placeholders by registering a
+	PropertySourcesPlaceholderConfigurer within the application context. Properties will
+	be resolved against the specified properties file or Properties object, so called
+	"local properties", if any, and against the Spring Environment's current set of
+	PropertySources.
+    -->
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <!-- 配置数据源，这里使用c3p0数据库连接池 -->
+    <!-- 代替原来在MyBatis配置文件中配置数据源 -->
+    <bean id="myDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+
+        <property name="maxPoolSize" value="30"/>
+        <property name="minPoolSize" value="10"/>
+    </bean>
+
+    <!-- 配置SqlSessionFactoryBean -->
+    <!-- 代替原来在MyBatis代码中通过SqlSessionFactoryBuilder实例的build方法获得SQLSessionFactory实例 -->
+    <bean id="mySqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <property name="dataSource" ref="myDataSource"/>
+    </bean>
+
+    <!-- 配置SqlSessionTemplate -->
+    <!-- 代替原来在MyBatis代码中通过SQLSessionFactory实例的openSession方法获得SQLSession实例 -->
+    <!-- （虽然下面的MapperFactoryBean和MapperFactoryBean都可以注入SQLSessionTemplate依赖，但它们也可以直接注入SqlSessionFactoryBean依赖，所以不一定要配置这个Bean） -->
+<!--    <bean id="mySqlSession" class="org.mybatis.spring.SqlSessionTemplate">-->
+<!--        <constructor-arg ref="mySqlSessionFactory"/>-->
+<!--    </bean>-->
+
+    <!-- 配置MapperFactoryBean，这个工厂负责生产BookMapper的Bean实例 -->
+    <!-- 代替原来在MyBatis配置文件中注册映射器（<mappers><mapper class="..."/></mappers>方式）并在MyBatis代码中通过SqlSession实例的getMapper方法获取XXXMapper实例 -->
+<!--    <bean id="myBookMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">-->
+<!--        <property name="mapperInterface" value="org.example.dao.BookMapper"/>-->
+<!--        <property name="sqlSessionFactory" ref="mySqlSessionFactory"/>-->
+<!--    </bean>-->
+
+    <!-- 配置MapperScannerConfigurer，它是上面的MapperFactoryBean的增强版 -->
+    <!-- 代替原来在MyBatis配置文件中注册映射器（<mappers><package name="..."/></mappers>方式）并在MyBatis代码中通过SqlSession实例的getMapper方法获取XXXMapper实例 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="org.example.dao"/>
+        <!-- 注意这里指定的是"sqlSessionFactoryBean"的"Name"，所以应该用value属性 -->
+        <property name="sqlSessionFactoryBeanName" value="mySqlSessionFactory"/>
+    </bean>
+</beans>
+```
+
+##### 如何在Spring中注册+注入映射器？
+
+官方文档写得好：
+
+> [mybatis-spring – 注入映射器](http://mybatis.org/spring/zh/mappers.html)
+>
+> # 注入映射器
+>
+> 与其在数据访问对象（DAO）中手工编写使用 `SqlSessionDaoSupport` 或 `SqlSessionTemplate` 的代码，还不如让 Mybatis-Spring 为你创建一个线程安全的映射器，这样你就可以直接注入到其它的 bean 中了：
+>
+> ```
+> <bean id="fooService" class="org.mybatis.spring.sample.service.FooServiceImpl">
+> <constructor-arg ref="userMapper" />
+> </bean>
+> ```
+>
+> 注入完毕后，映射器就可以在你的应用逻辑代码中使用了：
+>
+> ```
+> public class FooServiceImpl implements FooService {
+> 
+> private final UserMapper userMapper;
+> 
+> public FooServiceImpl(UserMapper userMapper) {
+>  this.userMapper = userMapper;
+> }
+> 
+> public User doSomeBusinessStuff(String userId) {
+>  return this.userMapper.getUser(userId);
+> }
+> }
+> ```
+
+还记得在刚学习Spring与Mybatis整合的时候，我们是怎样获取一个UserMapper实例的吗？
+
+封装一个UserMapper接口的实现类，定义一个SQLSessions属性并通过Spring容器注入实例（具体看我的Spring5学习笔记的9.2.6和9.2.8），定义一个UserMapper属性并手动调用sqlSession.getMapper(UserMapper.class)赋值。最后在Spring配置文件中将这个实现类配置为Bean，由Spring管理。
+
+现在我们使用接下来这两种更为简便的方式，连接口实现类都不用写了，可以直接通过纯配置获取UserMapper的Bean实例——
+
+> ## 注册映射器
+>
+> 注册映射器的方法根据你的配置方法，即经典的 XML 配置或新的 3.0 以上版本的 Java 配置（也就是常说的 `@Configuration`），而有所不同。
+>
+> ### XML 配置
+>
+> 在你的 XML 中加入 `MapperFactoryBean` 以便将映射器注册到 Spring 中。就像下面一样：
+>
+> ```
+> <bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+> <property name="mapperInterface" value="org.mybatis.spring.sample.mapper.UserMapper" />
+> <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+> </bean>
+> ```
+>
+> *<u>如果映射器接口 UserMapper 在相同的类路径下有对应的 MyBatis XML 映射器配置文件，将会被 `MapperFactoryBean` 自动解析。不需要在 MyBatis 配置文件中显式配置映射器，除非映射器配置文件与接口类不在同一个类路径下。</u>* 参考 `SqlSessionFactoryBean` 的 [`configLocation`](http://mybatis.org/spring/zh/factorybean.html) 属性以获取更多信息。
+>
+> 注意 `MapperFactoryBean` 需要配置一个 `SqlSessionFactory` 或 `SqlSessionTemplate`。它们可以分别通过 `sqlSessionFactory` 和 `sqlSessionTemplate` 属性来进行设置。 如果两者都被设置，`SqlSessionFactory` 将被忽略。由于 `SqlSessionTemplate` 已经设置了一个 session 工厂，`MapperFactoryBean` 将使用那个工厂。
+>
+> ### Java 配置
+>
+> ```
+> @Configuration
+> public class MyBatisConfig {
+> @Bean
+> public MapperFactoryBean<UserMapper> userMapper() throws Exception {
+> MapperFactoryBean<UserMapper> factoryBean = new MapperFactoryBean<>(UserMapper.class);
+> factoryBean.setSqlSessionFactory(sqlSessionFactory());
+> return factoryBean;
+> }
+> }
+> ```
+>
+> ## 发现映射器
+>
+> 不需要一个个地注册你的所有映射器。你可以让 MyBatis-Spring 对类路径进行扫描来发现它们。
+>
+> 有几种办法来发现映射器：
+>
+> - 使用 `<mybatis:scan/>` 元素
+> - 使用 `@MapperScan` 注解
+> - 在经典 Spring XML 配置文件中注册一个 `MapperScannerConfigurer`
+>
+> ......
+>
+> ### MapperScannerConfigurer
+>
+> `MapperScannerConfigurer` 是一个 `BeanDefinitionRegistryPostProcessor`，这样就可以作为一个 bean，包含在经典的 XML 应用上下文中。为了配置 `MapperScannerConfigurer`，使用下面的 Spring 配置：
+>
+> ```
+> <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+>   <property name="basePackage" value="org.mybatis.spring.sample.mapper" />
+> </bean>
+> ```
+>
+> *<u>如果你需要指定 `sqlSessionFactory` 或 `sqlSessionTemplate`，那你应该要指定的是 **bean 名**而不是 bean 的引用，因此要使用 `value` 属性而不是通常的 `ref` 属性</u>*：
+>
+> ```
+> <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+> ```
+>
+> 提示 在 MyBatis-Spring 1.0.2 之前，`sqlSessionFactoryBean` 和 `sqlSessionTemplateBean` 属性是唯一可用的属性。 但由于 `MapperScannerConfigurer` 在启动过程中比 `PropertyPlaceholderConfigurer` 运行得更早，经常会产生错误。基于这个原因，上述的属性已被废弃，现在建议使用 `sqlSessionFactoryBeanName` 和 `sqlSessionTemplateBeanName` 属性。
+
+#### 9.6.3 新建BookService.java
+
+```java
+package org.example.service;
+
+import org.example.pojo.Book;
+
+import java.util.List;
+
+public interface BookService {
+    
+    int insertBook(Book book);
+    
+    int deleteBookById(int id);
+    
+    int updateBookById(Book book);
+    
+    Book selectBookById(int id);
+    
+    List<Book> selectAllBooks();
+}
+```
+
+#### 9.6.4 新建BookServiceImpl.java
+
+```java
+package org.example.service;
+
+import org.example.dao.BookMapper;
+import org.example.pojo.Book;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class BookServiceImpl implements BookService {
+    
+    @Autowired
+    BookMapper bookMapper;
+    
+    public void setBookMapper(BookMapper bookMapper) {
+        this.bookMapper = bookMapper;
+    }
+    
+    @Override
+    public int insertBook(Book book) {
+        return bookMapper.insertBook(book);
+    }
+    
+    @Override
+    public int deleteBookById(int id) {
+        return bookMapper.deleteBookById(id);
+    }
+    
+    @Override
+    public int updateBookById(Book book) {
+        return bookMapper.updateBookById(book);
+    }
+    
+    @Override
+    public Book selectBookById(int id) {
+        return bookMapper.selectBookById(id);
+    }
+    
+    @Override
+    public List<Book> selectAllBooks() {
+        return bookMapper.selectAllBooks();
+    }
+}
+```
+
+#### 9.6.5 新建spring-service.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <import resource="classpath:spring-dao.xml"/>
+
+    <context:component-scan base-package="org.example.service"/>
+
+</beans>
+```
+
+#### 9.6.6 测试dao层和sevice层（CRUD）
+
+* 新建BookServiceImplTest.java
+
+```java
+package org.example.service;
+
+import org.example.pojo.Book;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class BookServiceImplTest {
+    
+    BookService bookService;
+    
+    @BeforeEach
+    void setUp() {
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring-service.xml");
+        this.bookService = applicationContext.getBean("bookServiceImpl", BookServiceImpl.class);
+    }
+    
+    @Test
+    void insertBook() {
+        // 注意这个对象的id属性没有被用到，因为我写的insert语句实际上并没有向id字段插入数据。
+        // 数据库会自动为新插入记录的id字段赋值。
+        int rowAffected = bookService.insertBook(new Book(999, "书名4", 100, "这是第四本书"));
+        System.out.println(rowAffected);
+    }
+    
+    @Test
+    void deleteBookById() {
+        int rowAffected = bookService.deleteBookById(4);
+        System.out.println(rowAffected);
+    }
+    
+    @Test
+    void updateBookById() {
+        int rowAffected = bookService.updateBookById(new Book(3, "Linux新版", 16, "从进门到改行"));
+//         int rowAffected = bookService.updateBookById(new Book(3, "Linux", 16, "从进门到改行"));
+        System.out.println(rowAffected);
+    }
+    
+    @Test
+    void selectBookById() {
+        Book book = bookService.selectBookById(3);
+        System.out.println(book);
+    }
+    
+    @Test
+    void selectAllBooks() {
+        List<Book> books = bookService.selectAllBooks();
+        for (Book book : books) {
+            System.out.println(book);
+        }
+    }
+}
+```
+
+当测试全部通过时，就可以进入下一步了！
+
+### 9.7 Spring MVC层
+
+#### 9.7.1 在web.xml中配置中央处理器和编码过滤器
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <!-- 配置DispatcherServlet -->
+    <!-- Central dispatcher for HTTP request handlers/controllers,...Dispatches to registered handlers for processing a web request, providing convenient mapping and exception handling facilities. -->
+    <servlet>
+        <servlet-name>dispatcherServlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!-- 关联一个Spring配置文件 -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:applicationContext.xml</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>dispatcherServlet</servlet-name>
+        <!-- 缺省匹配，优先级最低。不匹配*.jsp -->
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <!-- 配置CharacterEncodingFilter -->
+    <!-- 避免乱码问题 -->
+    <filter>
+        <filter-name>encoding</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>utf-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encoding</filter-name>
+        <!-- 路径匹配，优先级仅次于精确匹配。匹配所有路径 -->
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+</web-app>
+```
+
+#### 9.7.2 新建spring-mvc.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <import resource="classpath:spring-service.xml"/>
+
+    <!-- 配置静态资源处理器，将对静态资源的请求转发给Servlet容器的默认Servlet -->
+    <!-- Configures a handler for serving static resources by forwarding to the Servlet container's default Servlet.
+	Use of this handler allows using a "/" mapping with the DispatcherServlet while still utilizing the Servlet
+	container to serve static resources. -->
+    <mvc:default-servlet-handler/>
+
+    <!-- 启用SpringMVC注解驱动 -->
+    <!-- Configures the annotation-driven Spring MVC Controller programming model. -->
+    <mvc:annotation-driven/>
+
+    <!-- 配置视图解析器 -->
+    <!-- Convenient subclass of UrlBasedViewResolver that supports InternalResourceView -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <context:component-scan base-package="org.example.controller"/>
+
+</beans>
+```
+
+#### 9.7.3 在applicationContext.xml导入其他Spring配置文件
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="spring-mvc.xml"/>
+
+</beans>
+```
+
+到这里其实SSM框架的“整合”就已经完成了。
+
+#### 9.7.4 新建BookController.java
+
+```java
+package org.example.controller;
+
+import org.example.pojo.Book;
+import org.example.service.BookService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
+
+@Controller
+public class BookController {
+    
+    @Autowired
+    BookService bookService;
+    
+    @GetMapping("/books")
+    public String getAllBooks(Model model) {
+        List<Book> bookList = bookService.selectAllBooks();
+        model.addAttribute("bookList", bookList);
+        return "books";
+    }
+    
+}
+```
+
+#### 9.7.5 新建WEB-INF/jsp/books.jsp
+
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Title</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    ${bookList}
+</body>
+</html>
+```
+
+#### 9.7.6 测试controller层（仅select \*）
+
+部署项目，流程和2.1.6~2.1.8一样。
+
+访问：`http://localhost:8888/springmvc_03_ssm_war_exploded/books`，
+
+显示：`[Book(id=1, title=Java, number=50, introduction=从入门到放弃), Book(id=2, title=MySQL, number=80, introduction=从删库到跑路), Book(id=3, title=Linux, number=16, introduction=从进门到改行)]`
+
+测试成功！说明项目可以成功跑起来了！
+
+![SSM整合初步完成时项目结构](SpringMVC/SSM整合初步完成时项目结构.png)
+
+### 9.8 层面的完善
+
+接下来我们就可以实现其他CRUD操作以及完成前端的简单美化
+
+改index.jsp
+
+新建queryResult.jsp
+
