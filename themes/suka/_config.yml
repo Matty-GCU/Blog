@@ -80,9 +80,8 @@ footer:
 uiux:
   # Muilt line slogan is supported.
   slogan:
-    # - 提升自己快速学习和解决问题的能力！
+    #- 提升自己快速学习和解决问题的能力！
     #- slogan? 暂时没想好(￣┰￣*)
-    - 什么都不是
   # For most link color except post color
   link_color:
   primary_color:
