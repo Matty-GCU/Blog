@@ -14,7 +14,7 @@ categories:
   - SSM
   - Spring MVC
 date: 2022-04-05 19:45:00
-
+upadted: 
 ---
 
 # Spring MVC学习笔记
@@ -1337,7 +1337,7 @@ class MyRequest extends HttpServletRequestWrapper {
 * 后端独立部署后端，通过提供接口来向前端提供数据
 * 前端独立部署前端，负责渲染从后端接口获得的数据
 
-前后端虽然解耦，但也需要交互，而这时候就需要有一种**通用的数据交换格式**，即JSON。
+前后端虽然解耦，但也需要交互，而这时候就需要有一种**通用的数据交换格式**，即JSON (JavaScript Object Notation)。
 
 如何做到“通用”二字？那就是基于纯文本，这样就可以无视编程语言的差异。
 
@@ -2713,4 +2713,219 @@ public class BookController {
 >
 > 或许很多人，工作就做这些事情，但是对于个人的提高来说，还远远不够！
 
-## 十. ?
+## 十. 拦截器
+
+拦截器依赖于Spring MVC。
+
+拦截器只拦截对Controller的请求，不拦截对静态资源的请求。
+
+拦截器的设计基于AOP思想，是AOP的一种具体实现。
+
+### 10.1 拦截器(Interceptor)与过滤器(Filter)的区别
+
+高质量译文：[SpringMVC的拦截器（Interceptor）和过滤器（Filter）的区别与联系_xiaoyaotan_111的博客-CSDN博客_springmvc过滤器和拦截器](https://blog.csdn.net/xiaoyaotan_111/article/details/53817918)
+
+> **（1）过滤器：**
+>
+> 依赖于servlet容器。在实现上基于函数回调，可以对几乎所有请求进行过滤，但是缺点是一个过滤器实例只能在容器初始化时调用一次。使用过滤器的目的是用来做一些过滤操作，获取我们想要获取的数据，比如：在过滤器中修改字符编码；在过滤器中修改HttpServletRequest的一些参数，包括：过滤低俗文字、危险字符等
+>
+> ...
+>
+> **（2）拦截器：**
+>
+> 依赖于web框架，在SpringMVC中就是依赖于SpringMVC框架。在实现上基于Java的反射机制，属于面向切面编程（AOP）的一种运用。由于拦截器是基于web框架的调用，因此可以使用Spring的依赖注入（DI）进行一些业务操作，同时一个拦截器实例在一个controller生命周期之内可以多次调用。但是缺点是只能对controller请求进行拦截，对其他的一些比如直接访问静态资源的请求则没办法进行拦截处理
+>
+> ...
+
+高质量好文：[SpringMVC：拦截器和过滤器 - colin220 - 博客园](
+https://www.cnblogs.com/colin220/p/9606412.html#:~:text=SpringMVC%EF%BC%9A%E6%8B%A6%E6%88%AA%E5%99%A8%E5%92%8C%E8%BF%87%E6%BB%A4%E5%99%A8.%20%E9%A6%96%E5%85%88%E8%AF%B4%E6%98%8E%E4%B8%80%E4%B8%8B%E4%BA%8C%E8%80%85%E7%9A%84%E5%8C%BA%E5%88%AB%EF%BC%9A.%201.%20%E6%8B%A6%E6%88%AA%E5%99%A8%E5%9F%BA%E4%BA%8Ejava%E7%9A%84%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6%EF%BC%8C%E8%80%8C%E8%BF%87%E6%BB%A4%E5%99%A8%E6%98%AF%E5%9F%BA%E4%BA%8E%E5%87%BD%E6%95%B0%E5%9B%9E%E8%B0%83.,2.%20%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8D%E4%BE%9D%E8%B5%96%E4%BA%8Eservlet%E5%AE%B9%E5%99%A8%EF%BC%8C%E8%BF%87%E6%BB%A4%E5%99%A8%E4%BE%9D%E8%B5%96servlet%E5%AE%B9%E5%99%A8.%203.%20%E6%8B%A6%E6%88%AA%E5%99%A8%E5%8F%AA%E8%83%BD%E5%AF%B9action%E8%AF%B7%E6%B1%82%E8%B5%B7%E4%BD%9C%E7%94%A8%EF%BC%8C%E8%80%8C%E8%BF%87%E6%BB%A4%E5%99%A8%E5%88%99%E5%8F%AF%E4%BB%A5%E5%AF%B9%E5%87%A0%E4%B9%8E%E6%89%80%E6%9C%89%E7%9A%84%E8%AF%B7%E6%B1%82%E8%B5%B7%E4%BD%9C%E7%94%A8.%204)
+
+> 首先说明一下二者的区别：
+>
+> 　　1. 拦截器基于java的反射机制，而过滤器是基于函数回调
+>
+> 　　2. 拦截器不依赖于servlet容器，过滤器依赖servlet容器
+>
+> 　　3. 拦截器只能对action请求起作用，而过滤器则可以对几乎所有的请求起作用
+>
+> 　　4. 在action的生命周期中，拦截器可以多次被调用，而过滤器只能在容器初始化时被调用一次
+>
+> 　　5. 拦截器可以获取IOC容器中的各个bean，而过滤器就不行，这点很重要，在拦截器注入一个service，可以调用业务逻辑
+>
+> 过滤器和拦截器之间的关系如下图，Filter包裹Servlet，Servlet包裹Interceptor
+>
+> ![Tomcat-Filter-Servlet-Interceptor-Controller](SpringMVC/Tomcat-Filter-Servlet-Interceptor-Controller.jpg)
+
+### 10.2 使用
+
+***精髓都在JavaDoc注释里。***
+
+在`springmvc-02-hellomvc`项目中使用拦截器：
+
+* 新建org.example.interceptor
+
+* 新建MyInterceptor.java
+
+  ```java
+  package com.example.interceptor;
+  
+  import org.springframework.web.servlet.HandlerInterceptor;
+  import org.springframework.web.servlet.ModelAndView;
+  
+  import javax.servlet.http.HttpServletRequest;
+  import javax.servlet.http.HttpServletResponse;
+  
+  public class MyInterceptor implements HandlerInterceptor {
+      /**
+       * 请看原生注释，非常精辟！
+       * Interception point before the execution of a handler. Called after
+       * HandlerMapping determined an appropriate handler object, but before
+       * HandlerAdapter invokes the handler.
+       * <p>DispatcherServlet processes a handler in an execution chain, consisting
+       * of any number of interceptors, with the handler itself at the end.
+       * With this method, each interceptor can decide to abort the execution chain,
+       * typically sending an HTTP error or writing a custom response.
+       * 返回true就放行，执行链进入处理器或者下一个拦截器；
+       * 返回false就拦截，执行链中断，DispatcherServlet假定本拦截器已经自己负责响应了。
+       * @return {@code true} if the execution chain should proceed with the
+       * next interceptor or the handler itself. Else, DispatcherServlet assumes
+       * that this interceptor has already dealt with the response itself.
+       */
+      //最常用的就是这个方法
+      @Override
+      public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+          System.out.println("=====处理器方法执行前=====");
+          return true;
+      }
+      
+      /**
+       * 请看原生注释，非常精辟！
+       * Interception point after successful execution of a handler.
+       * Called after HandlerAdapter actually invoked the handler, but before the
+       * DispatcherServlet renders the view. Can expose additional model objects
+       * to the view via the given ModelAndView.
+       * <p>DispatcherServlet processes a handler in an execution chain, consisting
+       * of any number of interceptors, with the handler itself at the end.
+       * With this method, each interceptor can post-process an execution,
+       * getting applied in inverse order of the execution chain.（所谓逆序inverse order，是指执行链中第一个执行的postHandler方法是最后一个Interceptor的）
+       */
+      //这个方法在实际应用中作用不大
+      @Override
+      public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+          System.out.println("=====处理器方法执行后=====");
+      }
+      
+      /**
+       * 请看原生注释，非常精辟！
+       * Callback after completion of request processing, that is, after rendering
+       * the view. Will be called on any outcome of handler execution, thus allows
+       * for proper resource cleanup.
+       * <p>Note: Will only be called if this interceptor's {@code preHandle}
+       * method has successfully completed and returned {@code true}!
+       * <p>As with the {@code postHandle} method, the method will be invoked on each
+       * interceptor in the chain in reverse order, so the first interceptor will be
+       * the last to be invoked.
+       */
+      @Override
+      public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+          System.out.println("=====整个请求都处理完之后=====");
+      }
+  }
+  ```
+
+* 新建org.example.controller.TestController**2**.java（拦截器基于AOP，横切进去的时候不会影响原来的代码，这里重新写一个Controller只是为了方便演示）
+
+  ```java
+  package com.example.controller;
+  
+  import org.springframework.web.bind.annotation.RequestMapping;
+  import org.springframework.web.bind.annotation.RestController;
+  
+  @RestController
+  public class TestController2 {
+      
+      @RequestMapping("/testController2")
+      public String test() {
+          System.out.println("执行处理器方法");
+          return "OK";
+      }
+  }
+  ```
+
+* 在springmvc-servlet.xml中添加配置：
+
+  ```xml
+  <!-- 配置SpringMVC拦截器 -->
+  <mvc:interceptors>
+      <mvc:interceptor>
+          <!-- 这里配置的path为/**相当于web.xml配置url-pattern为/*，包括该路径及其任意子路径 -->
+          <mvc:mapping path="/**"/>
+          <bean class="com.example.interceptor.MyInterceptor"/>
+      </mvc:interceptor>
+  </mvc:interceptors>
+  ```
+
+访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/testController2`，控制台输出：
+
+```
+=====处理器方法执行前=====
+执行处理器方法
+=====处理器方法执行后=====
+=====整个请求都处理完之后=====
+```
+
+## 十一. 文件上传与下载
+
+P.S.还是在`springmvc-02-hellomvc`项目中测试。
+
+### 11.1 文件上传
+
+[Spring MVC文件上传](
+http://c.biancheng.net/spring_mvc/file-upload.html#:~:text=Spring%20MVC%20%E6%A1%86%E6%9E%B6%E7%9A%84%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E5%9F%BA%E4%BA%8E%20commons-fileupload%20%E7%BB%84%E4%BB%B6%EF%BC%8C%E5%B9%B6%E5%9C%A8%E8%AF%A5%E7%BB%84%E4%BB%B6%E4%B8%8A%E5%81%9A%E4%BA%86%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E5%B0%81%E8%A3%85%EF%BC%8C%E7%AE%80%E5%8C%96%E4%BA%86%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E7%9A%84%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0%EF%BC%8C%E5%8F%96%E6%B6%88%E4%BA%86%E4%B8%8D%E5%90%8C%E4%B8%8A%E4%BC%A0%E7%BB%84%E4%BB%B6%E4%B8%8A%E7%9A%84%E7%BC%96%E7%A8%8B%E5%B7%AE%E5%BC%82%E3%80%82,%E5%9C%A8%20Spring%20MVC%20%E4%B8%AD%E5%AE%9E%E7%8E%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E5%8D%81%E5%88%86%E5%AE%B9%E6%98%93%EF%BC%8C%E5%AE%83%E4%B8%BA%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%8F%90%E4%BE%9B%E4%BA%86%E7%9B%B4%E6%8E%A5%E6%94%AF%E6%8C%81%EF%BC%8C%E5%8D%B3%20MultpartiResolver%20%E6%8E%A5%E5%8F%A3%E3%80%82)
+
+> Spring MVC 框架的文件上传功能基于 commons-fileupload 组件，并在该组件上做了进一步的封装，简化了文件上传的代码实现，取消了不同上传组件上的编程差异。
+>
+> ## MultipartResolver接口
+>
+> 在 Spring MVC 中实现文件上传十分容易，它为文件上传提供了直接支持，即 MultpartiResolver 接口。MultipartResolver 用于处理上传请求，将上传请求包装成可以直接获取文件的数据，从而方便操作。
+>
+> MultpartiResolver 接口有以下两个实现类：
+>
+> - StandardServletMultipartResolver：使用了 Servlet 3.0 标准的上传方式。
+> - CommonsMultipartResolver：使用了 Apache 的 commons-fileupload 来完成具体的上传操作。
+
+#### 11.1.1 导入commons-fileupload组件
+
+要想使用Spring MVC的文件上传功能，必须导入CommonsMultipartResolver所依赖的Apache Commons FileUpload组件。
+
+若出现500错误，并且是NoClassDefFoundError，很可能是未把jar包导出到artifact中。
+
+```xml
+<!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload -->
+<!-- Compile Dependencies (1): commons-io » commons-io1 2.2	 -->
+<dependency>
+    <groupId>commons-fileupload</groupId>
+    <artifactId>commons-fileupload</artifactId>
+    <version>1.4</version>
+</dependency>
+```
+
+#### 11.1.2 配置MultipartResolver
+
+```xml
+<!-- 使用CommonsMultipartResolver配置Multipart解析器 -->
+<!-- 注意这个bean的id是固定的，必须为multipartResolver，否则会出现org.springframework.beans.BeanInstantiationException（500错误） -->
+<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    <!-- 请求的编码格式，默认为 ISO-8859-1，此处设置为 UTF-8（注：defaultEncoding 必须和 JSP 中的 pageEncoding 一致，以便正确读取表单的内容） -->
+    <property name="defaultEncoding" value="UTF-8" />
+    <!-- 上传文件大小上限，单位为字节（10485760Byte=10MB） -->
+    <property name="maxUploadSize" value="10485760" />
+</bean>
+```
+
+#### 11.1.3 前端form表单要求
+
+> 负责文件上传表单的编码类型必须是“multipart/form-data”类型。
+
+在/WEB-INF/jsp目录下新建upload.jsp：
+

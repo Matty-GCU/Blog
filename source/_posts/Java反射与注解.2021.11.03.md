@@ -347,15 +347,15 @@ Class类没有公共构造方法，其对象是JVM在加载类时通过调用类
 * void
 
 ```java
-Class c1 = Object.class;			//输出结果：class java.lang.Object
+Class c1 = Object.class;		//输出结果：class java.lang.Object
 Class c2 = Comparable.class;		//输出结果：interface java.lang.Comparable
-Class c3 = Override.class;			//输出结果：interface java.lang.Override
-Class c4 = int[].class;				//输出结果：class [I
-Class c5 = String[].class;			//输出结果：class [Ljava.lang.String;
+Class c3 = Override.class;		//输出结果：interface java.lang.Override
+Class c4 = int[].class;			//输出结果：class [I
+Class c5 = String[].class;		//输出结果：class [Ljava.lang.String;
 Class c6 = String[][].class;		//输出结果：class [[Ljava.lang.String;
 Class c7 = ElementType.class;		//输出结果：class java.lang.annotation.ElementType
-Class c8 = int.class;				//输出结果：int
-Class c9 = void.class;				//输出结果：void
+Class c8 = int.class;			//输出结果：int
+Class c9 = void.class;			//输出结果：void
 ```
 
 ### 2.3 类加载机制
@@ -449,11 +449,11 @@ Class c9 = void.class;				//输出结果：void
 
 ```java
 Class c1 = Class.forName("java.lang.Object");
-ClassLoader l1 = c1.getClassLoader();					//BootStrap ClassLoader，
+ClassLoader l1 = c1.getClassLoader();	//BootStrap ClassLoader，
 Class c2 = Class.forName("com.mysql.cj.jdbc.Driver");
-ClassLoader l2 = c2.getClassLoader();					//Extension ClassLoader，对应类ExtClassLoader
+ClassLoader l2 = c2.getClassLoader();	//Extension ClassLoader，对应类ExtClassLoader
 Class c3 = Class.forName("chapter04.stack.Stack");
-ClassLoader l3 = c3.getClassLoader();					//System ClassLoader，对应类AppClassLoader
+ClassLoader l3 = c3.getClassLoader();	//System ClassLoader，对应类AppClassLoader
 System.out.println(l1);
 System.out.println(l2);
 System.out.println(l3);
@@ -480,7 +480,7 @@ sun.misc.Launcher$AppClassLoader@18b4aac2
 
 > 为什么是“双”亲委派？简单来说这就是个翻译问题。如果换成“父辈代理机制”或是“上溯委托机制”就比较准确了。
 
-<img src="https://upload-images.jianshu.io/upload_images/7634245-7b7882e1f4ea5d7d.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp" title="双亲委派机制的流程图" style="zoom:80%;" />
+![双亲委派机制的流程图.webp](Java反射与注解.2021.11.03/双亲委派机制的流程图.webp.jpg)
 
 ### 2.5 获取运行时类的完整结构
 

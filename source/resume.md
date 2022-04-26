@@ -2,7 +2,7 @@
 
 ### 个人信息
 
-<img src="resume/3.jpg" alt="3" style="zoom:6%;float:right;" />
+<img src="resume/证件照.jpg" alt="3" style="zoom:6%;float:right;" />
 
 * 姓名：吴杭
 * 年级：20级

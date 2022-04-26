@@ -1,7 +1,9 @@
 ---
 abbrlink: fa714294
 title: 学习使用Maven构建项目
-tags: Maven
+tags:
+	- Java
+	- Maven
 categories:
 	- Java
 	- JavaEE

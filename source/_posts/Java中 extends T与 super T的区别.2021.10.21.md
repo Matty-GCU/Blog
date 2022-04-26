@@ -49,7 +49,7 @@ List <? extends Fruit> plate1 = new ArrayList<Fruit>();
 根据声明 **(Q1)** ，Java编译器也只知道plate1里放的是Fruit的子类或Fruit本身的对象，但具体是什么类型不知道，可能是Fruit？可能是Apple？可能是RedApple？显然，
 
 ```java
-Apple apple = new Fruit();			//compile error
+Apple apple = new Fruit();		//compile error
 RedApple redApple = new Apple();	//compile error
 ```
 

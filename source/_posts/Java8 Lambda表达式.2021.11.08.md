@@ -3,12 +3,10 @@ abbrlink: 77fa5cca
 title: Java8 Lambda表达式
 tags:
 	- Java
-	- Java 8
 	- Lambda表达式
 categories:
 	- Java
 	- JavaSE
-	- Java 8
 date: 2021-11-08
 updated: 2021-11-08
 ---
@@ -294,7 +292,3 @@ java.util.function包下有一系列内置函数式接口，也是Java 8伴随La
 ## 7. 写在最后
 
 其实有了上面的基础之后，看源码就变得非常简单了，毕竟一个函数式接口里面也就一个抽象方法，有问题多看源码即可。
-
----
-
-2021.11.08
