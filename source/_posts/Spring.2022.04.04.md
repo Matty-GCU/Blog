@@ -2,6 +2,7 @@
 abbrlink: 91344c8b
 title: Spring5学习笔记
 tags:
+	- SSM
 	- Spring
 	- MyBatis-Spring
 categories:

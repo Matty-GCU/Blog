@@ -2,6 +2,7 @@
 abbrlink: c460cf59
 title: MyBatis3学习笔记
 tags:
+	- SSM
 	- MyBatis
 	- Log4j
 	- Lombok

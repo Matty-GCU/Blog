@@ -2,8 +2,6 @@
 abbrlink: 4ec260e1
 title: Spring MVC学习笔记
 tags:
-	- Java
-	- JavaEE
 	- SSM
 	- Spring MVC
 	- RESTful
