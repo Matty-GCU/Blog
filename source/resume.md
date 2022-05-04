@@ -1,3 +1,9 @@
+---
+title: 个人简历
+date: 2022-03-29
+updated: 2022-03-29
+---
+
 <h1 style="text-align:center;">个人简历</h1>
 
 ### 个人信息

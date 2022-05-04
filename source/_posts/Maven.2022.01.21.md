@@ -709,8 +709,8 @@ mvn [plugin-name]:[goal-name]
            <plugin>
                <groupId>org.eclipse.jetty</groupId>
                <artifactId>jetty-maven-plugin</artifactId>
-               <version>9.4.11.v20180605</version>
-   			<!-- configuration部分可以不写，那样会采用默认设置 -->
+               <version>9.4.11.v20180605</version>    
+               <!-- configuration部分可以不写，那样会采用默认设置 -->
                <configuration>
                    <!-- 热部署，每10秒扫描一次 -->
                    <scanIntervalSeconds>10</scanIntervalSeconds>

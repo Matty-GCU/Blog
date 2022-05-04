@@ -12,7 +12,7 @@ categories:
   - SSM
   - Spring MVC
 date: 2022-04-05 19:45:00
-upadted: 
+upadted: 2022-04-29 13:48:00
 ---
 
 # Spring MVC学习笔记
@@ -2878,7 +2878,7 @@ P.S.还是在`springmvc-02-hellomvc`项目中测试。
 
 ### 11.1 文件上传
 
-[Spring MVC文件上传](
+本小节的重要参考资料，写得很清晰：[Spring MVC文件上传](
 http://c.biancheng.net/spring_mvc/file-upload.html#:~:text=Spring%20MVC%20%E6%A1%86%E6%9E%B6%E7%9A%84%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E5%9F%BA%E4%BA%8E%20commons-fileupload%20%E7%BB%84%E4%BB%B6%EF%BC%8C%E5%B9%B6%E5%9C%A8%E8%AF%A5%E7%BB%84%E4%BB%B6%E4%B8%8A%E5%81%9A%E4%BA%86%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E5%B0%81%E8%A3%85%EF%BC%8C%E7%AE%80%E5%8C%96%E4%BA%86%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E7%9A%84%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0%EF%BC%8C%E5%8F%96%E6%B6%88%E4%BA%86%E4%B8%8D%E5%90%8C%E4%B8%8A%E4%BC%A0%E7%BB%84%E4%BB%B6%E4%B8%8A%E7%9A%84%E7%BC%96%E7%A8%8B%E5%B7%AE%E5%BC%82%E3%80%82,%E5%9C%A8%20Spring%20MVC%20%E4%B8%AD%E5%AE%9E%E7%8E%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E5%8D%81%E5%88%86%E5%AE%B9%E6%98%93%EF%BC%8C%E5%AE%83%E4%B8%BA%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%8F%90%E4%BE%9B%E4%BA%86%E7%9B%B4%E6%8E%A5%E6%94%AF%E6%8C%81%EF%BC%8C%E5%8D%B3%20MultpartiResolver%20%E6%8E%A5%E5%8F%A3%E3%80%82)
 
 > Spring MVC 框架的文件上传功能基于 commons-fileupload 组件，并在该组件上做了进一步的封装，简化了文件上传的代码实现，取消了不同上传组件上的编程差异。
@@ -2923,7 +2923,209 @@ http://c.biancheng.net/spring_mvc/file-upload.html#:~:text=Spring%20MVC%20%E6%A1
 
 #### 11.1.3 前端form表单要求
 
-> 负责文件上传表单的编码类型必须是“multipart/form-data”类型。
-
 在/WEB-INF/jsp目录下新建upload.jsp：
 
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>上传文件</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <%-- 基于表单的文件上传，表单需要使用enctype属性，并将它的值设置为multipart/form-data，同时将表单的提交方式设置为post。 --%>
+    <form enctype="multipart/form-data" method="post" action="${pageContext.request.contextPath}/file">
+        <input type="file" name="myFile">
+        <input type="submit">
+    </form>
+</body>
+</html>
+```
+
+#### 11.1.4 编写Controller处理上传文件
+
+新建org.example.controller.**UploadController**.java：
+
+```java
+package com.example.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+
+@Controller
+public class UploadController {
+    
+    @RequestMapping("/toFileUploadPage")
+    public String toFileUploadPage() {
+        return "upload";
+    }
+    
+    /**
+     * @RequestParam("file")：将name="file"的input控件得到的文件封装成CommonsMultipartFile对象
+     * 实测这里不加@RequestParam会报java.lang.NullPointerException（500错误），哪怕方法的参数名本身是正确的
+     */
+    @PostMapping("/file")
+    @ResponseBody
+    public String saveFile(@RequestParam("myFile") CommonsMultipartFile commonsMultipartFile, HttpServletRequest request) {
+        // 已上传文件的保存地址，即该文件在服务器端的文件系统中的真实地址
+        // Gets the real path corresponding to the given virtual path.
+        // For example, if path is equal to /index.html,
+        // this method will return the absolute file path on the server's filesystem to which a request of the form http://<host>:<port>/<contextPath>/index.html would be mapped,
+        // where <contextPath> corresponds to the context path of this ServletContext.
+        String savingDirPath = request.getServletContext().getRealPath("/file");
+        File savingDir = new File(savingDirPath);
+        if (! savingDir.exists()) {
+            savingDir.mkdir();
+        }
+        String fileName = commonsMultipartFile.getOriginalFilename();
+        try {
+            commonsMultipartFile.transferTo(new File(savingDirPath + "/" + fileName));
+            return "文件已成功保存到服务器端文件系统的" + savingDirPath + "目录下！文件名仍为" + fileName + "！";
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "文件保存失败";
+    }
+}
+```
+
+CommonsMultipartFile类的常用方法：
+
+- String getOriginalFilename()：获取上传文件的原名
+- InputStream getInputStream()：获取文件流
+- void transferTo(File dest)：将上传文件保存到一个目录文件中
+
+#### 11.1.5 测试
+
+访问`http://localhost:8888/springmvc_02_hellomvc_war_exploded/toFileUploadPage`
+
+* ![上传测试1](SpringMVC/上传测试1.png)
+
+* ![上传测试2](SpringMVC/上传测试2.png)
+
+* ![上传测试3](SpringMVC/上传测试3.png)
+
+* ![上传测试4](SpringMVC/上传测试4.png)
+* ![上传测试5](SpringMVC/上传测试5.png)
+* ![上传测试6](SpringMVC/上传测试6.png)
+
+成功完成上传！
+
+### 11.2 文件下载
+
+#### 11.2.1 介绍
+
+和前面的文件上传同一系列的文章，写得非常好：[Spring MVC文件下载](http://c.biancheng.net/view/4484.html)
+
+> 实现文件下载有以下两种方法：
+>
+> - 通过超链接实现下载。
+> - 利用程序编码实现下载。
+>
+> 
+> 通过超链接实现下载固然简单，但暴露了下载文件的真实位置，并且只能下载存放在 Web 应用程序所在的目录下的文件。
+>
+> 利用程序编码实现下载可以增加安全访问控制，还可以从任意位置提供下载的数据，可以将文件存放到 Web 应用程序以外的目录中，也可以将文件保存到数据库中。
+>
+> 利用程序实现下载需要设置两个报头：
+>
+> 1）Web 服务器需要告诉浏览器其所输出内容的类型不是普通文本文件或 HTML 文件，而是一个要保存到本地的下载文件，这需要设置 Content-Type 的值为 application/x-msdownload。
+>
+> 2）Web 服务器希望浏览器不直接处理相应的实体内容，而是由用户选择将相应的实体内容保存到一个文件中，这需要设置 Content-Disposition 报头。
+>
+> 该报头指定了接收程序处理数据内容的方式，在 HTTP 应用中只有 attachment 是标准方式，attachment 表示要求用户干预。在 attachment 后面还可以指定 filename 参数，该参数是服务器建议浏览器将实体内容保存到文件中的文件名称。
+>
+> 设置报头的示例如下：
+>
+> response.setHeader("Content-Type", "application/x-msdownload");
+> response.setHeader("Content-Disposition", "attachment;filename="+filename);
+
+#### 11.2.2 前端
+
+写一个超链接：（新建/WEB-INF/jsp/**download.jsp**）
+
+```jsp
+<a href="${pageContext.request.contextPath}/downloadFile">下载服务器端文件保存目录下的的第一个文件</a>
+```
+
+#### 11.2.3 后端
+
+写一个控制器：（新建org.example.controller.**DownloadController.java**）
+
+```java
+package com.example.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+
+@Controller
+public class DownloadController {
+    
+    @RequestMapping("/toFileDownloadPage")
+    public String toFileDownloadPage() {
+        return "download";
+    }
+    
+    @RequestMapping("/downloadFile")
+    public String downloadFile(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        
+        // 1. 获取要下载的文件的File实例
+        String savingDirPath = request.getServletContext().getRealPath("/file");
+        File savingDir = new File(savingDirPath);
+        File file = Objects.requireNonNull(savingDir.listFiles())[0];
+        
+        // 2. 设置响应头
+        // Clears any data that exists in the buffer as well as the status code, headers.
+        // The state of calling getWriter or getOutputStream is also cleared.
+        response.reset();
+        // Sets a response header with the given name and value.
+        // If the header had already been set, the new value overwrites the previous one.
+        // The containsHeader method can be used to test for the presence of a header before setting its value.
+        response.setHeader("Content-Type", "application/x-msdownload");
+        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(file.getName(), StandardCharsets.UTF_8));
+        response.setCharacterEncoding("UTF-8");
+        
+        // 3. 文件读写操作
+        ServletOutputStream output = response.getOutputStream();
+        InputStream input = new FileInputStream(file);
+        byte[] b = new byte[1024];
+        // Reads some number of bytes from the input stream and stores them into the buffer array b.
+        // The number of bytes actually read is returned as an integer.
+        // If no byte is available because the stream is at the end of the file, the value -1 is returned
+        while (input.read(b) != -1) {
+            System.out.println(b[0]);
+            output.write(b);
+        }
+        output.flush();
+        output.close();
+        return null;
+    }
+    
+}
+```
+
+#### 11.2.5 测试
+
+![下载测试1](SpringMVC/下载测试1.png)
+
+![下载测试2](SpringMVC/下载测试2.png)
+
+![下载测试3](SpringMVC/下载测试3.png)
+
+![下载测试4](SpringMVC/下载测试4.png)
