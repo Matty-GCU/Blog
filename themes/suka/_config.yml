@@ -81,7 +81,7 @@ uiux:
   # Muilt line slogan is supported.
   slogan:
     #- 提升自己快速学习和解决问题的能力！
-    #- slogan? 暂时没想好(￣┰￣*)
+    - slogan? 暂时没想好(￣┰￣*)
   # For most link color except post color
   link_color:
   primary_color:
@@ -117,8 +117,8 @@ nav:
       #link: /about.html
     友链:
       link: /links.html
-    简历:
-      link: /resume.html
+    #简历:
+      #link: /resume.html
     #画廊(测试失败):
       #link: /gallery.html
     #测试页面（很重要，有她的评论）:
