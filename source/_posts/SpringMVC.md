@@ -951,7 +951,7 @@ public class HelloControllerTwo {
 
 #### 4.1.3 return String
 
-* **新建一个TestHelloController.java**（注意我们要访问的是**/index.jsp**，因为/WEB-INF/jsp/hello.jsp无法直接通过URL访问）
+* **新建一个TestHelloController.java**（注意我们要访问的是 **/index.jsp**，因为/WEB-INF/jsp/hello.jsp无法直接通过URL访问）
 
 ```java
 package com.example.controller;
@@ -1533,7 +1533,7 @@ User user = new User("1", "English Test & 中文测试", 18);
 
 ###### 解决方案1
 
-给ToStringTestController的**@RequestMapping**注解传入一个**produce**参数，
+给ToStringTestController的 **@RequestMapping**注解传入一个**produce**参数，
 
 ```java
 @Controller

@@ -1,8 +1,9 @@
 ---
 abbrlink: d60742fc
-title: Java单例模式实现中的synchronized代码块和volatile关键字
+title: Java单例模式中的synchronized代码块和volatile关键字
 tags:
 	- 单例模式
+	- Java
 	- synchronized
 	- volatile
 categories:
@@ -11,7 +12,7 @@ categories:
 date: 2022-03-11
 updated: 2022-03-11
 ---
-# Java单例模式实现中的synchronized代码块和volatile关键字
+# Java单例模式中的synchronized代码块和volatile关键字
 
 ## [用不用 synchronized 的区别？](https://mp.weixin.qq.com/s/-fv3uDIf9zADtU0Vue8SsA)
 

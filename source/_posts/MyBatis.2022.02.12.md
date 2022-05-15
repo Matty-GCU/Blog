@@ -54,9 +54,7 @@ broken的笔记：[MyBatis | broken's blog](https://guopeixiong.github.io/2021/1
 
 ### 1.1 什么是MyBatis
 
-![mybatis-logo](https://mybatis.org/images/mybatis-logo.png)
-
-
+![mybatis-logo](MyBatis.2022.02.12/mybatis-logo.png)
 
 看看**官方文档**首页的介绍：
 
@@ -944,19 +942,17 @@ public class User {
 
 ### 5.2 ResultMap简介
 
-`resultMap` 元素是 MyBatis 中最重要最强大的元素。
+> `resultMap` 元素是MyBatis中最重要最强大的元素。
 
-ResultMap 的设计思想是，对简单的语句做到零配置，对于复杂一点的语句，只需要描述语句之间的关系就行了。
+> ResultMap 的设计思想是，对简单的语句做到零配置，对于复杂一点的语句，只需要描述语句之间的关系就行了。
 
-……
-
-*如果这个世界总是这么简单就好了。*
-
-***高级结果映射***
-
-*MyBatis 创建时的一个思想是：数据库不可能永远是你所想或所需的那个样子。 我们希望每个数据库都具备良好的第三范式或 BCNF 范式，可惜它们并不都是那样。 如果能有一种数据库映射模式，完美适配所有的应用程序，那就太好了，但可惜也没有。 而 ResultMap 就是 MyBatis 对这个问题的答案。*
-
-……
+> ……
+>
+> *如果这个世界总是这么简单就好了。*
+>
+> ***高级结果映射***
+>
+> *MyBatis 创建时的一个思想是：数据库不可能永远是你所想或所需的那个样子。 我们希望每个数据库都具备良好的第三范式或 BCNF 范式，可惜它们并不都是那样。 如果能有一种数据库映射模式，完美适配所有的应用程序，那就太好了，但可惜也没有。 而 ResultMap 就是 MyBatis 对这个问题的答案。*
 
 等后面学一对多，多对一再看。
 
