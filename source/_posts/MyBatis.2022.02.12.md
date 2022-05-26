@@ -21,7 +21,7 @@ updated: 2022-02-12
 
 **基于教程**
 
-[【狂神说Java】Mybatis最新完整教程IDEA版通俗易懂_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1NE411Q7Nx?spm_id_from=333.999.0.0)（发布时间：2019-10-02）
+[【狂神说Java】Mybatis最新完整教程IDEA版通俗易懂_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1NE411Q7Nx)（发布时间：2019-10-02）
 
 **本机环境**
 
@@ -590,14 +590,13 @@ List<User> getUserLike(String nameLike);
 
    ```xml
    <select id="getUserLike" parameterType="String" resultType="xyz.wuhang.pojo.User">
-       <!-- 在MySQL中使用CONCAT函数拼接字符串 -->
        select * from mybatis.user where name like #{nameLike}
    </select>
    ```
-
-   ```java
+   
+```java
    List<User> list = userMapper.getUserLike("name%");
-   ```
+```
 
 2. 在SQL语句中，拼接通配符
 

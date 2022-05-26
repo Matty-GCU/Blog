@@ -20,7 +20,7 @@ updated: 2022-04-04 00:00:00
 
 ### 基于教程
 
-[【狂神说Java】Spring5最新完整教程IDEA版通俗易懂_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1WE411d7Dv?spm_id_from=333.999.0.0)（发布时间：2019-10-13）
+[【狂神说Java】Spring5最新完整教程IDEA版通俗易懂_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1WE411d7Dv)（发布时间：2019-10-13）
 
 《Java EE框架整合开发入门到实战》 - 清华大学出版社（出版时间：2018-09）
 

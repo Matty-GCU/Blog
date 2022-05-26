@@ -9,14 +9,14 @@ categories:
 	- Java
 	- JavaSE
 date: 2021-11-03
-updated: 2021-11-03
+updated: 2022-05-22
 ---
 
 # 	Java注解与反射
 
 基于教程：
 
-[【狂神说Java】注解和反射_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1p4411P7V3?from=search&seid=9700813218872012494&spm_id_from=333.337.0.0)
+[【狂神说Java】注解和反射_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1p4411P7V3)
 
 参考资料：
 
@@ -207,7 +207,7 @@ public class Test {
 
 注解的本质与接口有关。
 
-#### 验证[^疑惑1]
+#### 验证
 
 先看测试代码：
 
@@ -249,6 +249,16 @@ true
 #### 结论
 
 注解的本质是一种特殊的接口，而它的参数类型和参数名实际上是接口的方法返回类型和方法名。（当然注解使用起来和接口还是有很大区别的
+
+---
+
+2022.05.22补充：
+
+`public @interface Annotation`经过编译-->反编译后会变成`public interface Annotation extends Annotation`，`String value()`经过编译-->反编译后会变成`public abstract String value()`。
+
+用jd-gui和XJad这两款反编译工具都可以复现。
+
+---
 
 ## Part 2 反射(Reflection)
 ### 2.1 反射概述
@@ -394,7 +404,7 @@ Class c9 = void.class;			//输出结果：void
 
 2）初始化一个类时，如果该类的直接父类未被初始化，则先初始化其直接父类。JVM会保证该类及其所有祖先类都被初始化。
 
-3）如果类中有初始化语句，则直接执行初始化语句。[^疑惑2]
+3）如果类中有初始化语句，则直接执行初始化语句。
 
 **什么时候会发生类的初始化？**
 
@@ -410,7 +420,11 @@ Class c9 = void.class;			//输出结果：void
   >
   > 详见文章：[类初始化阶段详解_拿笔小星的博客-CSDN博客](https://blog.csdn.net/u013096088/article/details/79439482)
 
-* 调用静态方法（static）[^疑惑3]
+* 调用静态方法（static）
+
+  > 疑惑：
+  >
+  > 我们知道，通过类名调用静态方法时，类的构造方法并不会被执行，那么此时该类是否已被初始化？如果是，那么是否可以理解为：初始化一个类不一定要调用其构造方法，但是调用一个类的构造方法一定导致该类的初始化？
 
 * 使用java.lang.reflection包中的方法对类进行反射调用
 
@@ -655,7 +669,3 @@ public class ReflectionDemo {
 ---
 
 2021.11.02
-
-[^疑惑1]: 网上很多资料的验证方式是这样的：`public @interface Annotation`经过编译-->反编译后会变成`public interface Annotation extends annotation`，`String value()`经过编译-->反编译后会变成`public abstract String value()`。但是实事求是地说，我自己无论用jd-gui (JD-core ver1.1.3) 还是XJad (Jad ver1.5.8e2) ，反编译得到的结果都和一开始的源文件没有区别，根本无法复现这种实验。
-[^疑惑2]: 实际上我没看懂这句话，查了资料也还是没搞懂。
-[^疑惑3]: 我们知道，通过类名调用静态方法时，类的构造方法并不会被执行，那么此时该类是否已被初始化？如果是，那么是否可以理解为：初始化一个类不一定要调用其构造方法，但是调用一个类的构造方法一定导致该类的初始化？

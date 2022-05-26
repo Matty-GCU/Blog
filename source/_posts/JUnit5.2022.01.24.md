@@ -15,7 +15,7 @@ updated: 2022-01-24
 
 #### 基于教程
 
-[单元测试框架-JUnit 5_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1MZ4y1w7fb?from=search&seid=8335046307141159001&spm_id_from=333.337.0.0)（发布时间：2021-03-29）
+[单元测试框架-JUnit 5_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1MZ4y1w7fb)（发布时间：2021-03-29）
 
 #### 参考教程
 

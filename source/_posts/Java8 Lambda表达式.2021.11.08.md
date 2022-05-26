@@ -8,7 +8,7 @@ categories:
 	- Java
 	- JavaSE
 date: 2021-11-08
-updated: 2021-11-08
+updated: 2022-05-22
 ---
 
 # Java8 Lambda表达式
@@ -175,6 +175,38 @@ interface InterfaceDemo {
 在Java 8中可以用方法引用来进一步简化Lambda表达式。（虽然两者在底层实现原理上略有不同，但在实际使用中完全可以视为等价）
 
 有时候多个Lambda表达式的实现函数是一样的，我们可以封装成一个通用方法，再通过方法引用来实现接口。
+
+---
+
+2022.05.22补充精品好文：
+
+[java中的方法引用_lkforce的博客-CSDN博客_java 方法引用](https://blog.csdn.net/lkforce/article/details/99682885)
+
+> **目录**
+>
+> [简介](https://blog.csdn.net/lkforce/article/details/99682885#t0)
+>
+> [一，类::静态方法](https://blog.csdn.net/lkforce/article/details/99682885#t1)
+>
+> [二，对象::实例方法](https://blog.csdn.net/lkforce/article/details/99682885#t2)
+>
+> [三，类::实例方法](https://blog.csdn.net/lkforce/article/details/99682885#t3)
+>
+> [四，构造器引用，Class::new](https://blog.csdn.net/lkforce/article/details/99682885#t4)
+>
+> [五，数组引用，数组::new](https://blog.csdn.net/lkforce/article/details/99682885#t5)
+>
+> ------
+>
+> ### 简介
+>
+> 从JDK1.8开始，可以使用方法引用。
+>
+> 方法引用的操作符是双冒号"**::**"。
+>
+> 方法引用可以认为是Lambda表达式的一种特殊形式，Lambda表达式可以让开发者自定义抽象方法的实现代码，方法引用则可以让开发者直接引用已存在的实现方法，作为Lambda表达式的Lambda体(**参数列表得一致**)。
+
+---
 
 #### 5.1 方法引用语法
 
