@@ -1,6 +1,8 @@
 ---
 abbrlink: eef5bf5d
 title: Redis6学习笔记
+date: 2022-05-22
+updated: 
 ---
 
 # Redis6学习笔记
@@ -87,3 +89,10 @@ NoSQL的存储不依赖于业务逻辑，而是以简单的key-value模式存储
 ### 1.5 行式数据库与列式数据库
 
 [一图理解行式数据库和列式数据库的区别 - 简书](https://www.jianshu.com/p/ad2533e5cfaa)
+
+
+
+
+
+SpringBoot + Redis 实现接口限流，一个注解的事！
+https://mp.weixin.qq.com/s/ymgwN2w-YxCIug8lgxrwog
