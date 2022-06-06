@@ -3,6 +3,8 @@ abbrlink: eef5bf5d
 title: Redis6学习笔记
 date: 2022-05-22
 updated: 
+categories: Redis
+tags: Redis
 ---
 
 # Redis6学习笔记
