@@ -28,7 +28,7 @@ Redis中文官方网站：http://redis.cn/
 * Redis For Linux 6.2.1
 * CentOS 7.9
 
-## 一. NoSQL数据库引入&简介
+## 一. NoSQL数据库简介
 
 ### 1.1 编程技术的分类
 
@@ -105,7 +105,11 @@ NoSQL的存储不依赖于业务逻辑，而是以简单的key-value模式存储
 
 [一图理解行式数据库和列式数据库的区别 - 简书](https://www.jianshu.com/p/ad2533e5cfaa)
 
-### 1.6 在Linux环境中安装Redis
+### 二. 安装Redis
+
+### 2.1 在Linux环境中安装Redis
+
+> Windows环境如果想安装，可以直接从git上pull一份
 
 #### 安装命令
 
@@ -141,7 +145,7 @@ Redis安装目录下都有些什么？
 
 ![Redis默认安装目录](Redis/Redis默认安装目录.png)
 
-### 1.7 启动Redis
+### 2.2 启动Redis
 
 #### 前台启动方式
 
@@ -176,7 +180,7 @@ redis-server /etc/redis.conf
 redis-cli
 ```
 
-### 1.8 关闭Redis
+### 2.3 关闭Redis
 
 > 前提当然是以“后台启动方式”启动的
 
