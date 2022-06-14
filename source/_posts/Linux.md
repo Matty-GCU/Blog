@@ -8,6 +8,14 @@ tags: Linux
 ---
 # Linux学习笔记
 
+## TODO
+
+### 2.4
+
+前面之所以要配置主机名，就是因为我们在远程登录之前，最好要在**客户机的hosts文件**中配置好服务器ip与服务器hostname的映射，这样就不用手动输入IP地址了。
+
+但是我经过测试发现，hosts文件中的hostname并不需要与服务器实际上的hostname相同，只要ip正确，照样能正常登录。
+
 ## 前言
 
 ### 基于教程
@@ -20,7 +28,11 @@ tags: Linux
 
 [Linux学习教程，Linux入门教程（超详细）](http://c.biancheng.net/linux_tutorial/)
 
+[Shell脚本：Linux Shell脚本学习指南（超详细）](http://c.biancheng.net/shell/)
+
 [Linux 教程 | 菜鸟教程](https://www.runoob.com/linux/linux-tutorial.html)
+
+* [Linux 命令大全 | 菜鸟教程](https://www.runoob.com/linux/linux-command-manual.html)
 
 ### 环境版本
 
@@ -39,9 +51,9 @@ tags: Linux
 
 <img src="Linux/狭义的Linux和广义的Linux.png" alt="狭义的Linux和广义的Linux" style="zoom:50%;" />
 
-我们作为后端开发/运维人员，使用Linux时最经常接触的当然就是shell层。
+我们作为后端开发/运维人员，使用Linux时最经常接触的当然就是Shell层。
 
-进入shell有两种方式，一个是原生的shell入口，即控制台模式下的**Linux控制台(Console)** ；另一个是桌面环境封装好的模拟入口（即图形界面模式下的**终端(Terminal)** 。
+进入Shell有两种方式，一个是原生的Shell入口，即控制台模式下的**Linux控制台(Console)** ；另一个是桌面环境封装好的模拟入口（即图形界面模式下的**终端(Terminal)** 。
 
 > 在 Linux 发展的早期，唯一能用的工具就是 Shell，Linux 用户都是在 Shell 中输入文本命令，并查看文本输出；如果有必要的话，Shell 也能显示一些基本的图形。
 >
@@ -235,7 +247,7 @@ VMWare官网：https://www.vmware.com/cn.html
 > * [关于linux下/srv、/var和/tmp的职责区分_frcoder的博客-CSDN博客_linux中srv](https://blog.csdn.net/u012107143/article/details/54972544)
 > * [linux常见分区及各目录作用与全称_frcoder的博客-CSDN博客](https://blog.csdn.net/u012107143/article/details/54973028)
 
-### 2.2 VIM编辑器
+### 2.2 vi/vim编辑器
 
 VI是Unix操作系统和类Unix操作系统中最通用的文本编辑器。（白底黑字）
 
@@ -251,7 +263,7 @@ VIM编辑器是从VI发展出来的一个性能更强大的文本编辑器，VIM
 
 要使Linux虚拟机与物理主机相互连通，就必须得到虚拟机的ip地址。
 
-可以在shell中使用`ifconfig`(networks interfaces configuring)命令查看和配置网卡接口。
+可以在Shell中使用`ifconfig`(networks interfaces configuring)命令查看和配置网卡接口。
 
 扩展资料：
 
@@ -279,7 +291,7 @@ VMware提供了三种网络连接方式。
 
 ##### NAT模式
 
-虚拟机喝主机构建一个专用网络，并通过虚拟网络地址转换（NAT）设备对IP进行转换。虚拟机通过共享主机IP可以访问外部网络，但外部网络无法访问虚拟机。
+虚拟机和主机构建一个专用网络，并通过虚拟网络地址转换（NAT）设备对IP进行转换。虚拟机通过共享主机IP可以访问外部网络，但外部网络无法访问虚拟机。
 
 ![NAT模式](Linux/NAT模式.png)
 
@@ -288,3 +300,119 @@ VMware提供了三种网络连接方式。
 虚拟机只与主机共享一个专用网络，与外部网络无法通信。
 
 ![仅主机模式](Linux/仅主机模式.png)
+
+#### 2.3.3 配置静态IP
+
+为什么不用默认的自动获取IP？因为通常我们不希望作为服务器的（被访问的）机器的IP是变化的。
+
+##### 图形化界面方式
+
+*应用程序-系统工具-设置-网络-有线-设置图标-IPv4-IPv4 Method*
+
+选择“手动”，即可配置IP地址、子网掩码、网关。
+
+##### Shell方式
+
+修改ifcfg-ens33，即修改"ens33"这个"if"(network interface)的"cfg"(configuration)。
+
+```shell
+vim /etc/sysconfig/network-srcipts/ifcfg-ens33
+```
+
+注意静态IP的网络号要符合实际
+
+```
+...
+# 这里原来是dhcp
+BOOTPROTO="static"
+...
+# 下面几行是为了配置静态IP而新增的
+IPADDR=192.168.150.100
+NETMASK=255.255.255.0
+GATEWAY=192.168.150.2
+DNS1=192.168.150.2
+```
+
+重启网络
+
+```shell
+service network restart
+```
+
+#### 2.3.4 配置主机名
+
+##### 查看主机名
+
+其实在Shell中已经自然地显示主机名了，就像这样：
+
+`[用户名@主机名 当前目录]#或$ 光标所在处`
+
+当然你也可以主动通过命令查看：
+
+```shell
+# 显示hostname
+hostname
+# 显示hostname相关信息（hostname control）
+hostnamectl	#hostnamectl status
+```
+
+##### 修改配置文件方式
+
+```shell
+# 里面唯一的内容就是主机名，直接修改即可
+vim /etc/hostname
+# 重启
+reboot
+```
+
+##### 命令方式
+
+```shell
+# 修改主机名，立即生效
+hostnamectl set-hostname newhostname
+```
+
+> hostnamectl命令来自于英文词组“hostname control”的缩写，其功能是用于显示与设置主机名称。基于/etc/hostname文件修改主机名称需要重启服务器后才可生效，而hostnamectl命令设置过的主机名称可以立即生效，效率更高。
+>
+> **语法格式**：hostnamectl [参数]
+>
+> **常用参数**：
+>
+> | -H           | 操作远程主机       |
+> | ------------ | ------------------ |
+> | status       | 显示当前主机名设置 |
+> | set-hostname | 设置系统主机名     |
+>
+> 参考资料：[hostnamectl命令 – 显示与设置主机名称 – Linux命令大全(手册)](https://www.linuxcool.com/hostnamectl)
+
+### 2.4 远程管理
+
+> 提到远程管理，通常指的是远程管理服务器，而非个人计算机。个人计算机可以随时拿来用，服务器通常放置在机房中，用户无法直接接触到服务器硬件，只能采用远程管理的方式。
+>
+> 远程管理，实际上就是计算机（服务器）之间通过网络进行数据传输（信息交换）的过程，与浏览器需要 HTTP 协议（超文本传输协议）浏览网页一样，远程管理同样需要远程管理协议的支持。
+>
+> 目前，常用的远程管理协议有以下 4 种：
+>
+> - RDP（remote desktop protocol）协议：远程桌面协议，大部分 Windows 系统都默认支持此协议，Windows 系统中的远程桌面管理就基于该协议。
+> - RFB（Remote FrameBuffer）协议：图形化远程管理协议，VNC 远程管理工具就基于此协议。
+> - Telnet：命令行界面远程管理协议，几乎所有的操作系统都默认支持此协议。此协议的特点是，在进行数据传送时使用明文传输的方式，也就是不对数据进行加密。
+> - SSH（Secure Shell）协议：命令行界面远程管理协议，几乎所有操作系统都默认支持此协议。和 Telnet 不同，该协议在数据传输时会对数据进行加密并压缩，因此使用此协议传输数据既安全速度又快。
+>
+> 参考资料：[Linux远程管理协议（RFB、RDP、Telnet和SSH）](http://c.biancheng.net/view/2845.html)
+
+远程管理Linux服务器虽然有多种方式，但大多是基于SSH协议。
+
+#### 2.4.1 Windows命令行方式
+
+`ssh 用户名@主机名`
+
+#### 2.4.2 远程管理工具
+
+市面上有很多，但要么是收费的，要么界面难看，要么不仅是收费的而且界面难看。
+
+我推荐一个国产的免费工具——**Aechoterm，免费、UI简单好看、基本功能齐全（支持SSH和SFTP）**，上手体验大有当初第一次使用Apifox的感觉，如沐春风，十分舒适。
+
+官网：https://ec.nantian.com.cn/#/home
+
+官网文档/功能演示：https://ec.nantian.com.cn/#/about
+

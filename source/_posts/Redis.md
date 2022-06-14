@@ -36,7 +36,7 @@ Redis中文官方网站：http://redis.cn/
 
 **Redis**就是一种典型的NoSQL数据库。
 
-### 1.2 我们为什么需要NoSQL数据库
+### 1.2 为什么需要NoSQL数据库
 
 传统的网络应用：客户端 --> 单体的应用服务器（CPU和内存压力） --> 单体的数据库服务器（IO压力）
 
@@ -105,11 +105,11 @@ NoSQL的存储不依赖于业务逻辑，而是以简单的key-value模式存储
 
 [一图理解行式数据库和列式数据库的区别 - 简书](https://www.jianshu.com/p/ad2533e5cfaa)
 
-### 二. 安装Redis
+## 二. 初识Redis
 
 ### 2.1 在Linux环境中安装Redis
 
-> Windows环境如果想安装，可以直接从git上pull一份
+> 如果想在Windows环境安装Redis，直接从[Releases · tporadowski/redis](https://github.com/tporadowski/redis/releases)下载一份解压版即可
 
 #### 安装命令
 
@@ -187,5 +187,19 @@ redis-cli
 * 直接执行`redis-cli shutdown`
 
 * 在Redis命令行中执行`shutdown`
-* 先通过`ps -ef | grep redis`查看进程信息，再根据进程号直接杀死进程`kill 进程号`
+* 先通过`ps -ef | grep redis`查看进程信息，再根据进程号，执行`kill PID`直接杀死进程
 
+
+
+
+
+
+
+2.4 Redis相关入门知识
+
+Redis默认有16个数据库，下标为0~15，可以在Redis命令行中通过`select index`进行切换。
+
+
+
+Redis命令中心（Redis commands） -- Redis中国用户组（CRUG）
+http://redis.cn/commands.html
