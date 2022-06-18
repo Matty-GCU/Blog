@@ -10,11 +10,7 @@ tags: Linux
 
 ## TODO
 
-### 2.4
-
-前面之所以要配置主机名，就是因为我们在远程登录之前，最好要在**客户机的hosts文件**中配置好服务器ip与服务器hostname的映射，这样就不用手动输入IP地址了。
-
-但是我经过测试发现，hosts文件中的hostname并不需要与服务器实际上的hostname相同，只要ip正确，照样能正常登录。
+2.3.4为什么要配置主机名
 
 ## 前言
 
@@ -26,13 +22,15 @@ tags: Linux
 
 ### 参考教程
 
-[Linux学习教程，Linux入门教程（超详细）](http://c.biancheng.net/linux_tutorial/)
+[Linux学习教程，Linux入门教程（超详细） - C语言中文网](http://c.biancheng.net/linux_tutorial/)
 
-[Shell脚本：Linux Shell脚本学习指南（超详细）](http://c.biancheng.net/shell/)
+[Shell脚本：Linux Shell脚本学习指南（超详细） - C语言中文网](http://c.biancheng.net/shell/)
 
 [Linux 教程 | 菜鸟教程](https://www.runoob.com/linux/linux-tutorial.html)
 
-* [Linux 命令大全 | 菜鸟教程](https://www.runoob.com/linux/linux-command-manual.html)
+[Linux 命令大全 | 菜鸟教程](https://www.runoob.com/linux/linux-command-manual.html)
+
+[Linux 中国◆开源社区](https://linux.cn/)
 
 ### 环境版本
 
@@ -303,7 +301,7 @@ VMware提供了三种网络连接方式。
 
 #### 2.3.3 配置静态IP
 
-为什么不用默认的自动获取IP？因为通常我们不希望作为服务器的（被访问的）机器的IP是变化的。
+为什么要配置静态IP？为什么不用默认的“自动获取IP”？因为我们不希望作为服务器的（被访问的）机器的IP是变化的。
 
 ##### 图形化界面方式
 
@@ -378,12 +376,54 @@ hostnamectl set-hostname newhostname
 >
 > **常用参数**：
 >
-> | -H           | 操作远程主机       |
+> | 参数         | 含义               |
 > | ------------ | ------------------ |
+> | -H           | 操作远程主机       |
 > | status       | 显示当前主机名设置 |
 > | set-hostname | 设置系统主机名     |
 >
 > 参考资料：[hostnamectl命令 – 显示与设置主机名称 – Linux命令大全(手册)](https://www.linuxcool.com/hostnamectl)
+
+##### 为什么要配置主机名？TODO
+
+主机名host name和域名domain name是有区别的，但是这里还有一个完整域名(Fully Qualified Domain Name, FQDN)的概念。
+
+> 如果你有一个服务器，绑定了多个域名：
+>
+> - guoyunhe.me
+> - www.guoyunhe.me
+> - wiki.guoyunhe.me
+> - shop.guoyunhe.me
+>
+> 你可以选择 “www”， “wiki” 和 “shop” 中的任何一个作为主机名。也可以另取一个，比如 “server” ， “vps-1″。
+>
+> **第 1 步**：修改 **/etc/hostname** 文件。主机名只能包含数字，字母和连字符。
+>
+> ```
+> server
+> ```
+>
+> **第 2 步**：修改 **/etc/hosts** 文件。把完整域名 FQDN “server.guoyunhe.me” 放到主机名 “server” 之前。
+>
+> ```
+> 127.0.0.1    localhost
+> 127.0.1.1    server.guoyunhe.me server guoyunhe.me www.guoyunhe.me wiki.guoyunhe.me shop.guoyunhe.me
+> ```
+>
+> **第 3 步**：重启系统。
+>
+> 检查主机名和域名： “**hostname**” 命令输出 server ， “**hostname -f**” 输出 server.guoyunhe.me 。
+>
+> 参考资料：[正确设置 GNU/Linux 主机名 Hostname 和域名 Domain – 鹤仙人](https://guoyunhe.me/2016/08/25/set-hostname-and-domain-name-correctly/)
+
+举个例子：
+
+* baidu.com——域名
+* www——主机名（默认，可缺省）
+* www.baidu.com——完整域名
+
+> 讲一个故事：刚开始，我发明了互联网通信(即在网上传输东西)，互联网通信是发生在TCP/IP协议之上(即这个协议是互联网通信的基础之一，TCP像车子，IP类似房子的地址)。IP就是上面说的这个TCP/IP协议的产物，有了他就可以想和谁通信就和谁通信，于是很多人开始把IP记住来通信，但是我发现很多人对数字不敏感，他们都说IP不好记。后来，我就发明了DNS解析，域名就是DNS的产物，如baidu.com就是一个域名，这个比那些IP的数字好记忆很多，得到了很多人的认可，他们不用再输入IP了，直接输入baidu.com就可以通信了，很开心。那么有人很好奇，就问：“域名能用了，那IP是不是就没法用了啊？”，我回答：“有啊，你回去输入IP试一试，和以前一样的。”。有人问：“那域名怎么就能通信了？”，我说：“因为我发明了的DNS帮了大忙，他把域名变成IP了啊:D”。有人问：“那域名不会重复吗？”，我回答：“不可能，我规定了不能重复，注册的时候都记录在本子上了，绝对不会重复。一句话，DNS让域名不会重复，懂了吗？”。有一天，有人跑过来问我，兴奋地说：“我发现了一个好玩的事情，我输入[www.baidu.com](http://www.baidu.com/)和baidu.com都能访问，为什么啊？”，我说：“你是否发现了多出一个www的东西？其实它叫'主机名'。”。 他又问：“那主机名有什么用？我不加www这个主机名，也可以通信(这里指上网)，那这个主机名不是没有作用了吗？还占用了位置呢，害我多输入几个字母。”。我说：“哈哈，不是没用，而是你用的机会少，但你用的机会少，你没用过，不代表他没有用啊。认知限制了你的想法啊~。在这里，我先把'主机'比作'房间'，你用baidu.com这个域名可以找到我的'房子'，但是你开了大门，进来的是我的'房子'的一个'房间'，这个就是'www房间'，是我在DNS规定的默认的缺省的'房间'，即你不填上主机(可以比作房间名或房间号)，默认就到这个'www房间'。而我还有其他的'房间'啊，我还有'a房间'、'b房间'、'Z房间'等等。你说你要进来'a房间'?容易啊，你加上主机(房间号)就可以啦，就是说你输入a.baidu.com就行啦。”。最后，还有人问我：“为什么默认是'www'啊？”。我说：“打个比方，我反问你一个问题：为什么你会说话的时候，叫你父亲作'爸爸'啊？”。 有人会回答是习惯。对，是习惯，习惯用'www'作为默认。 补充一点"不知道顶级域名的定义的请自行查阅资料"。好了，我把我的理解用文字说出来了，还有不懂，请追问：D
+> 参考资料：[有一个人说网址前面的www是主机名？主机？我懵了_百度知道](https://zhidao.baidu.com/question/461162404144932445.html)
 
 ### 2.4 远程管理
 
@@ -402,9 +442,11 @@ hostnamectl set-hostname newhostname
 
 远程管理Linux服务器虽然有多种方式，但大多是基于SSH协议。
 
+当然，在连接之前需要在客户机的hosts文件中配置好主机名与IP地址的映射，方便访问。
+
 #### 2.4.1 Windows命令行方式
 
-`ssh 用户名@主机名`
+`ssh 用户名@IP地址/已在hosts中映射的主机名/已在hosts中映射的域名`
 
 #### 2.4.2 远程管理工具
 
@@ -416,3 +458,220 @@ hostnamectl set-hostname newhostname
 
 官网文档/功能演示：https://ec.nantian.com.cn/#/about
 
+### 2.5 系统管理
+
+#### 2.5.1 进程与服务
+
+系统中正在执行的程序，叫做“进程”（process）
+
+系统启动后一直存在并常驻内存的进程，叫做“服务”（service）。这样的进程又称“守护进程”（daement process），这样的服务又称“系统服务”，在Linux系统中，这两个概念说的其实是一回事。
+
+#### 2.5.2 了解service命令
+
+适用于CentOS 6之前的版本，虽然新版本的CentOS仍然向下兼容该命令，但实际上能管理的服务很少，所以了解即可。
+
+**基本语法**
+
+```shell
+service 服务名 start|stop|restart|status    # 开启服务|停止服务|重启服务|查看服务状态
+```
+
+**查看服务**
+
+```shell
+ls /etc/init.d    # init.d的d就是daemon
+```
+
+![SysV.initscripts](Linux/SysV.initscripts.png)
+
+#### 2.5.3 掌握systemctl命令
+
+**基本语法**
+
+```shell
+systemctl start|stop|restart|status 服务名    # 开启服务|停止服务|重启服务|查看服务状态
+```
+
+**查看服务**
+
+```shell
+ls /usr/lib/systemd    # systemd的d就是daemon
+ls /usr/lib/systemd/system
+```
+
+![systemd services](Linux/systemd services.png)
+
+> RHEL/CentOS 7.0中一个最主要的改变，就是切换到了systemd。它用于替代红帽企业版Linux前任版本中的SysV和Upstart，对系统和服务进行管理。systemd兼容SysV和Linux标准组的启动脚本。
+>
+> Systemd是一个Linux操作系统下的系统和服务管理器。它被设计成向后兼容SysV启动脚本，并提供了大量的特性，如开机时平行启动系统服务，按需启动守护进程，支持系统状态快照，或者基于依赖的服务控制逻辑。
+>
+> <u>先前的使用SysV初始化或Upstart的红帽企业版Linux版本中，使用位于/etc/rc.d/init.d/目录中的bash初始化脚本进行管理。而在RHEL 7/CentOS 7中，这些启动脚本被服务单元取代了。服务单元以.service文件扩展结束，提供了与初始化脚本同样的用途。要查看、启动、停止、重启、启用或者禁用系统服务，你要使用systemctl来代替旧的service命令。</u>
+> systemd是服务管理程序，他整合了service和chkconfig的功能为一体，可以永久性或只在当前会话中启用/禁用服务。
+> 参考资料：https://blog.csdn.net/wzyzzu/article/details/44171319
+
+#### 2.5.4 系统运行级别
+
+**CentOS 6**的7个运行级别：
+
+* **runlevel 0 Halt 停机模式**。系统默认运行级别不能设置为0，否则电脑一开机就会关机，无法正常启动。
+* **runlevel 1 Single user mode 单用户模式**，只允许root用户登录，但也可以绕过登录验证。主要用于系统维护，禁止远程登陆。
+* **runlevel 2 Multiuser, without NFS 多用户模式**，没有网络文件系统（NFS）支持。
+* **runlevel 3 Full multiuser mode 完全多用户模式**，有网络文件系统（NFS）支持。用户登录后会进入控制台模式的黑框框，在没有网络的环境下等同于运行级别2。
+* **runlevel 4 Unused 系统未使用**。在某些特殊情况下会用到，例如在笔记本电脑的电池用尽时，可以切换到这一模式来做一些设置。
+* **runlevel 5 X11 图形界面模式**
+* **runlevel 6 Reboot 重启模式**。系统默认运行级别不能设置为6，否则电脑一开机就进入重启模式，会不停地重启，无法正常启动。
+
+**CentOS 7**简化为两个比较主要的运行级别：
+
+* **multi-user.target** 等价于原运行级别3（多用户有网，无图形界面）
+
+* **graphical.target** 等价于原运行级别5（多用户有网，有图形界面）
+
+| 运行级别（runlevel） | SysVinit系统        | systemd系统       |
+| -------------------- | ------------------- | ----------------- |
+| 0                    | 关闭或暂停系统      | shutdown.target   |
+| 1                    | 单用户模式          | rescue.target     |
+| 2                    | 多用户，没有NFS     | multi-user.target |
+| 3                    | 完全多用户，有NFS   | multi-user.target |
+| 4                    | 未使用              | multi-user.target |
+| 5                    | X11（图形用户界面） | graphical.target  |
+| 6                    | 重启系统            | reboot.target     |
+
+```shell
+# 查看当前系统默认的运行级别
+systemctl get-default
+# 设置当前系统默认的运行级别
+systemctl set-default multi-user.target	# 开机为黑框框，我喜欢
+systemctl set-default graphical.target	# 开机为图形桌面
+# 切换系统当前的运行级别
+init 0 # 关机
+init 1 # 进入单用户模式
+init 3 # 进入完全多用户模式，即控制台模式
+init 5 # 进入图形界面模式、
+init 6 # 重启
+```
+
+本小节参考资料：
+
+* [Linux的运行级别 - 知乎](https://zhuanlan.zhihu.com/p/352164966)
+
+* [Linux运行级别概述 以及 CentOS 7以上系统修改密码的方式_菜菜的大数据开发之路的博客-CSDN博客](https://blog.csdn.net/nmsLLCSDN/article/details/117234454)
+* [在Linux中检查当前运行级别的五种方法？_target](https://www.sohu.com/a/315115025_495675)
+
+#### 2.5.5 三种Init系统
+
+##### sysvinit
+
+技术|浅析 Linux 初始化 init 系统: sysvinit
+https://linux.cn/article-4422-1.html
+
+##### UpStart
+
+技术|浅析 Linux 初始化 init 系统: UpStart
+https://linux.cn/article-4423-1.html
+
+##### Systemd
+
+技术|浅析 Linux 初始化 init 系统: Systemd
+https://linux.cn/article-4424-2.html?tt
+
+#### 2.5.6 配置服务自启动
+
+##### 通过ntsysv工具
+
+ntsysv工具提供了一个基于文本界面的菜单操作方式。
+
+首先在Shell输入`setup`命令进入Text Mode Setup Utility工具窗口，
+
+![Text.Mode.Setup.Utility](Linux/Text.Mode.Setup.Utility.png)
+
+再选中system services进入ntsysv工具（也可以在Shell直接输入`ntsysv`命令进入），
+
+![ntsysv](Linux/ntsysv.png)
+
+对每一个service选择是否automatically started，按空格选中或取消选中。
+
+##### 通过chkconfig或systemctl命令
+
+配置SysV服务（CentOS 6）自启动：
+
+```shell
+# 列出所有服务
+chkconfig --list
+# 设置服务在2345运行级别下是否开启（016运行级别下默认关闭服务）
+chkconfig 服务名 on或off
+# 设置服务在特定运行级别下是否开启
+chkconfig --level 1|2|3|4|5|6 服务名 on或off
+```
+
+配置systemd服务（CentOS 7）自启动：
+
+```shell
+# 设置服务是否自启动
+systemctl enable或diable 服务名
+# 查看服务是否开机启动
+systemctl list-unit-files
+```
+
+`systemctl list-unit-files`的输出结果：
+
+![systemctl.list-unit-files](Linux/systemctl.list-unit-files.png)
+
+UNIT FILE这个概念包括但不限于service，所以不妨加上| grep .service筛选一下。
+
+STATE为enable代表开机自启，disable代表开机不自启，static代表未配置，表示该服务与其他服务相关联，不能单独设置该服务的启动状态。
+
+##### 实践关闭和打开防火墙服务
+
+CentOS 6中是iptables服务，CentOS 7中已经没有这个服务了，取而代之的显然是**firewalld**服务。
+
+注意forewall后面有个d，即daemon，没错，这又是一个系统服务&守护进程。
+
+```
+[root@hadoop100 ~]# systemctl status firewalld
+● firewalld.service - firewalld - dynamic firewall daemon
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled; vendor preset: enabled)
+   Active: active (running) since Wed 2022-06-15 19:53:52 CST; 2h 20min ago
+     Docs: man:firewalld(1)
+ Main PID: 891 (firewalld)
+    Tasks: 2
+   CGroup: /system.slice/firewalld.service
+           └─891 /usr/bin/python2 -Es /usr/sbin/firewalld --nofork --nopid
+
+Jun 15 19:53:52 hadoop100 systemd[1]: Starting firewalld - dynamic firewall daemon...
+Jun 15 19:53:52 hadoop100 systemd[1]: Started firewalld - dynamic firewall daemon.
+Jun 15 19:53:52 hadoop100 firewalld[891]: WARNING: AllowZoneDrifting is enabled. This is considered an insecure configuration option. It will...g it now.Hint: Some lines were ellipsized, use -l to show in full.
+[root@hadoop100 ~]# 
+```
+
+
+
+
+
+
+
+loaded             ##系统服务已经初始化完成，加载过配置
+
+active（running）       ##正有一个或多个程序正在系统中执行， vsftpd就是这种模式
+
+atcive（exited）        ##僅執行一次就正常結束的服務， 目前並沒有任何程序在系統中執行
+
+atcive（waiting）       ##正在執行當中，不過還再等待其他的事件才能继续处理
+
+inactive            ##服务关闭
+
+enbaled           ##服务开机启动
+
+disabled          ##服务开机不自启
+
+static                ##服务开机启动项不可被管理
+
+failed                ##系统配置错误
+————————————————
+版权声明：本文为CSDN博主「sky__man」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/sky__man/article/details/78178821
+
+
+
+systemctl status 结果 - Search
+https://cn.bing.com/search?q=systemctl+status+%E7%BB%93%E6%9E%9C&qs=n&form=QBRE&sp=-1&pq=systemctl+status+jie&sc=7-20&sk=&cvid=2E04B6ED3CC94F37800D719D4980671D

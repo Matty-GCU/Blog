@@ -13,7 +13,7 @@ tags: Redis
 
 ### 基于教程
 
-[【尚硅谷】Redis 6 入门到精通 超详细 教程_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1Rv41177Af)（视频录制时间为2021年4月份）
+[【尚硅谷】Redis 6 入门到精通 超详细 教程_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1Rv41177Af)（讲师是王泽老师，视频录制时间为2021年4月份）
 
 ### 官网
 
@@ -23,10 +23,10 @@ Redis官方网站：https://redis.io/
 
 Redis中文官方网站：http://redis.cn/
 
-### 版本
+### 环境版本
 
 * Redis For Linux 6.2.1
-* CentOS 7.9
+* CentOS 7.9.2009
 
 ## 一. NoSQL数据库简介
 

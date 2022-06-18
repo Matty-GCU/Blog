@@ -82,7 +82,9 @@ uiux:
   slogan:
     #- 提升自己快速学习和解决问题的能力！
     #- slogan? 暂时没想好(￣┰￣*)
-    - 求知若饥，虚心若愚。
+    #- 求知若饥，虚心若愚。
+    #- Stay hungry. Stay foolish.
+    - 2022.03.29
   # For most link color except post color
   link_color:
   primary_color:
