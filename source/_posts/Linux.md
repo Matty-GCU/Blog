@@ -466,7 +466,7 @@ hostnamectl set-hostname newhostname
 
 系统启动后一直存在并常驻内存的进程，叫做“服务”（service）。这样的进程又称“守护进程”（daement process），这样的服务又称“系统服务”，在Linux系统中，这两个概念说的其实是一回事。
 
-#### 2.5.2 了解service命令
+#### 2.5.2 service命令
 
 适用于CentOS 6之前的版本，虽然新版本的CentOS仍然向下兼容该命令，但实际上能管理的服务很少，所以了解即可。
 
@@ -484,12 +484,13 @@ ls /etc/init.d    # init.d的d就是daemon
 
 ![SysV.initscripts](Linux/SysV.initscripts.png)
 
-#### 2.5.3 掌握systemctl命令
+#### 2.5.3 systemctl命令
 
 **基本语法**
 
 ```shell
-systemctl start|stop|restart|status 服务名    # 开启服务|停止服务|重启服务|查看服务状态
+systemctl start|stop|restart|status 服务名.service    # 开启服务|停止服务|重启服务|查看服务状态
+systemctl start|stop|restart|status 服务名            # .service可以省略
 ```
 
 **查看服务**
@@ -524,8 +525,13 @@ ls /usr/lib/systemd/system
 **CentOS 7**简化为两个比较主要的运行级别：
 
 * **multi-user.target** 等价于原运行级别3（多用户有网，无图形界面）
-
 * **graphical.target** 等价于原运行级别5（多用户有网，有图形界面）
+
+> 注意这两种的运行级别并不是一一对应关系！
+>
+> 比如SysVinit系统的级别2、3、4到了systemd系统其实都是multi-user.target，即原来的级别3；
+>
+> 比如SysVinit系统的级别0原来叫做停机halt模式，但到了systemd系统则是shutdown.target，变成了关机，并不是原来的停机。经过实测，在CentOS 7里执行`init 0`的效果确实是关机，而我猜测在CentOS 6里执行`init 0`会停机但不是关机。
 
 | 运行级别（runlevel） | SysVinit系统        | systemd系统       |
 | -------------------- | ------------------- | ----------------- |
@@ -577,7 +583,7 @@ https://linux.cn/article-4424-2.html?tt
 
 #### 2.5.6 配置服务自启动
 
-##### 通过ntsysv工具
+##### 通过ntsysv工具配置
 
 ntsysv工具提供了一个基于文本界面的菜单操作方式。
 
@@ -591,12 +597,12 @@ ntsysv工具提供了一个基于文本界面的菜单操作方式。
 
 对每一个service选择是否automatically started，按空格选中或取消选中。
 
-##### 通过chkconfig或systemctl命令
+##### 通过chkconfig或systemctl命令配置
 
 配置SysV服务（CentOS 6）自启动：
 
 ```shell
-# 列出所有服务
+# 列出所有SysV服务服务
 chkconfig --list
 # 设置服务在2345运行级别下是否开启（016运行级别下默认关闭服务）
 chkconfig 服务名 on或off
@@ -607,71 +613,225 @@ chkconfig --level 1|2|3|4|5|6 服务名 on或off
 配置systemd服务（CentOS 7）自启动：
 
 ```shell
+# 列出所有systemd单元（以查看服务是否开机启动）
+systemctl list-unit-files
 # 设置服务是否自启动
 systemctl enable或diable 服务名
-# 查看服务是否开机启动
-systemctl list-unit-files
 ```
 
 `systemctl list-unit-files`的输出结果：
 
 ![systemctl.list-unit-files](Linux/systemctl.list-unit-files.png)
 
-UNIT FILE这个概念包括但不限于service，所以不妨加上| grep .service筛选一下。
+Systemctl接受服务（.service），挂载点（.mount），套接口（.socket）和设备（.device）作为单元，所以UNIT FILE这个概念包括但不限于service。不妨加上| grep .service筛选一下。
 
 STATE为enable代表开机自启，disable代表开机不自启，static代表未配置，表示该服务与其他服务相关联，不能单独设置该服务的启动状态。
 
-##### 实践关闭和打开防火墙服务
+##### 实践：关闭和打开防火墙服务
 
-CentOS 6中是iptables服务，CentOS 7中已经没有这个服务了，取而代之的显然是**firewalld**服务。
+CentOS 6中是iptables服务，CentOS 7中已经没有这个服务了，取而代之的显然是**firewalld**服务。注意forewall后面有个d，即daemon，没错，这又是一个系统服务&守护进程。
 
-注意forewall后面有个d，即daemon，没错，这又是一个系统服务&守护进程。
+首先通过`systemctl status`查看服务信息：
 
 ```
 [root@hadoop100 ~]# systemctl status firewalld
-● firewalld.service - firewalld - dynamic firewall daemon
+...
    Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled; vendor preset: enabled)
-   Active: active (running) since Wed 2022-06-15 19:53:52 CST; 2h 20min ago
-     Docs: man:firewalld(1)
- Main PID: 891 (firewalld)
-    Tasks: 2
-   CGroup: /system.slice/firewalld.service
-           └─891 /usr/bin/python2 -Es /usr/sbin/firewalld --nofork --nopid
-
-Jun 15 19:53:52 hadoop100 systemd[1]: Starting firewalld - dynamic firewall daemon...
-Jun 15 19:53:52 hadoop100 systemd[1]: Started firewalld - dynamic firewall daemon.
-Jun 15 19:53:52 hadoop100 firewalld[891]: WARNING: AllowZoneDrifting is enabled. This is considered an insecure configuration option. It will...g it now.Hint: Some lines were ellipsized, use -l to show in full.
+   Active: active (running) since Mon 2022-06-20 22:21:23 CST; 4min 36s ago
+...
 [root@hadoop100 ~]# 
 ```
 
+![systemctl status](Linux/systemctl status.png)
 
+使用`systemctl stop`关闭服务，
 
+```
+[root@hadoop100 ~]# systemctl stop firewalld
+[root@hadoop100 ~]# systemctl status firewalld
+...
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled; vendor preset: enabled)
+   Active: inactive (dead) since Mon 2022-06-20 22:28:27 CST; 19s ago
+...
+[root@hadoop100 ~]# 
+```
 
+再使用`systemctl start`开启服务，
 
+```
+[root@hadoop100 ~]# systemctl start firewalld
+[root@hadoop100 ~]# systemctl status firewalld
+...
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled; vendor preset: enabled)
+   Active: active (running) since Mon 2022-06-20 22:30:28 CST; 3s ago
+...
+[root@hadoop100 ~]# 
+```
 
+使用`systemctl disable`关闭服务开机自启动，此时可以`init 6`重启一下，发现firewalld服务确实没有自启动。
 
-loaded             ##系统服务已经初始化完成，加载过配置
+```
+[root@hadoop100 ~]# systemctl disable firewalld
+Removed symlink /etc/systemd/system/multi-user.target.wants/firewalld.service.
+Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
+[root@hadoop100 ~]# systemctl status firewalld
+...
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled; vendor preset: enabled)
+   Active: active (running) since Mon 2022-06-20 22:30:28 CST; 7min ago
+...
+[root@hadoop100 ~]# init 6
 
-active（running）       ##正有一个或多个程序正在系统中执行， vsftpd就是这种模式
+ X  shell close
+Press any key to reconnect 
 
-atcive（exited）        ##僅執行一次就正常結束的服務， 目前並沒有任何程序在系統中執行
+Last login: Tue Jun 21 14:22:36 2022 from 192.168.150.1
+[root@hadoop100 ~]# systemctl status firewalld
+● firewalld.service - firewalld - dynamic firewall daemon
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:firewalld(1)
+[root@hadoop100 ~]# 
+```
 
-atcive（waiting）       ##正在執行當中，不過還再等待其他的事件才能继续处理
+最后使用`systemctl enable`开启服务开机自启动，毕竟防火墙还是有用的，哈哈。
 
-inactive            ##服务关闭
+```
+[root@hadoop100 ~]# systemctl enable firewalld
+Created symlink from /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service to /usr/lib/systemd/system/firewalld.service.
+Created symlink from /etc/systemd/system/multi-user.target.wants/firewalld.service to /usr/lib/systemd/system/firewalld.service.
+[root@hadoop100 ~]# systemctl status firewalld
+● firewalld.service - firewalld - dynamic firewall daemon
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled; vendor preset: enabled)
+   Active: active (running) since Mon 2022-06-20 22:30:28 CST; 9min ago
+...
+[root@hadoop100 ~]# 
+```
 
-enbaled           ##服务开机启动
+##### 扩展阅读：使用systemctl查看Linux服务状态
 
-disabled          ##服务开机不自启
+[How to view status of a service on Linux using systemctl - nixCraft](https://www.cyberciti.biz/faq/systemd-systemctl-view-status-of-a-service-on-linux/)（精品好文，原文更详细）
 
-static                ##服务开机启动项不可被管理
+> ## Viewing the Status of a Service
+>
+> The syntax is as follows for the systemctl command
+>
+> `systemctl status {service-name}`
+>
+> `systemctl status {unit-name}`
+>
+> ### How to view status of a service called nginx
+>
+> Type:
+> `$ systemctl status nginx.service`
+>
+> `## ssh server status ##`
+>
+> `$ systemctl status sshd.service`
+>
+> `## Lighttpd web server status ##`
+>
+> `$ systemctl status lighttpd.service`
+>
+> ```
+> ● lighttpd.service - Lighttpd Daemon
+>      Loaded: loaded (/lib/systemd/system/lighttpd.service; enabled; vendor preset: enabled)
+>      Active: active (running) since Tue 2020-08-04 04:29:19 UTC; 3 weeks 2 days ago
+>    Main PID: 105 (lighttpd)
+>       Tasks: 1 (limit: 115783)
+>      Memory: 56.5M
+>      CGroup: /system.slice/lighttpd.service
+>              └─105 /usr/sbin/lighttpd -D -f /etc/lighttpd/lighttpd.conf
+> 
+> Aug 04 04:29:19 utls-bash-wiki systemd[1]: Starting Lighttpd Daemon...
+> Aug 04 04:29:19 utls-bash-wiki systemd[1]: Started Lighttpd Daemon.
+> ```
+>
+> The dot (“●“) uses color on supported terminals to summarize the unit state at a glance. White color indicates an “inactive” or “deactivating” state. Red color indicates a “failed” or “error” state. Green indicates an “active”, “reloading” or “activating” state.
+>
+> ### Understanding systemd service/unit states
+>
+> The status of Linux service depends upon various states such as follows:
+>
+> | Service status   | Description                                                  |
+> | ---------------- | ------------------------------------------------------------ |
+> | active (running) | Service or daemon is running in the background. For example, sshd or nginx/apache web server and listing for incoming traffic. |
+> | active (exited)  | Service successfully started from the config file. Typically one time services configuration read before Service was exited. For example, AppArmor or Firewall service. |
+> | active (waiting) | Our service is running but waiting for an event such as CPUS/printing event. |
+> | inactive         | Service is not running.                                      |
+> | enabled          | Service is enabled at boot time.                             |
+> | disabled         | Service is disbled and will not be started at Linux server boot time. |
+> | static           | Service cannot be enabled on Linux, but mostly started by another systemd unit automatically. In other words, the unit file is not enabled and has no provisions for allowing in the [Install] unit file section. |
+> | masked           | Service is completely disabled and any start operation on it always fails. |
+> | alias            | Service name is an alias. It means service is symlink to another unit file. |
+> | linked           | Made available through one or more symlinks to the unit file (permanently in /etc/systemd/system/ or transiently in /run/systemd/system/), even though the unit file might reside outside of the unit file search path. |
+>
+> ...
+>
+> 
+>
+> We can list all services unit as follows:
+> `$ sudo systemctl --type=service`
+> Want to see mount type units? Try:
+> `$ sudo systemctl --type=mount`
+> ...
+>
+> 
+>
+> ### To show all installed unit files use:
+>
+> ```
+> $ sudo systemctl list-unit-files
+> ```
+>
+> ...
+>
+> 
+>
+> ## What to do if the service such as nginx is not running?
+>
+> Turn on the systemd service:
+> `$ sudo systemctl enable nginx.service`
+> Start the nginx service:
+> `$ sudo systemctl start nginx.service`
+> We can stop or restart the service as follows:
+> `$ sudo systemctl stop nginx.service$ sudo systemctl restart nginx.service`
+> Verify that if a service enabled or not, run:
+> `$ sudo systemctl is-enabled nginx.service`
+> See status again:
+> `$ sudo systemctl status nginx.service`
+>
+> ...
 
-failed                ##系统配置错误
-————————————————
-版权声明：本文为CSDN博主「sky__man」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
-原文链接：https://blog.csdn.net/sky__man/article/details/78178821
+#### 2.5.7 关机
 
+```shell
+shutdown			# 无参数，默认1分钟后关机
+shutdown -H			# halt，默认1分钟后停机（还有个-h表示关机后停机，不要）
+shutdown --halt 	# halt，默认1分钟后停机
+shutdown -P			# poweroff，默认1分钟后关机
+shutdown --poweroff	# poweroff，默认1分钟后关机
+shutdown -r			# reboot，默认1分钟后重启
+shutdown --reboot	# reboot，默认1分钟后重启
 
+shutdown -c			# cancel，取消关机
+shutdown now		# now，立即关机
+shutdown 10			# 10分钟后关机。时间单位是分钟。
 
-systemctl status 结果 - Search
-https://cn.bing.com/search?q=systemctl+status+%E7%BB%93%E6%9E%9C&qs=n&form=QBRE&sp=-1&pq=systemctl+status+jie&sc=7-20&sk=&cvid=2E04B6ED3CC94F37800D719D4980671D
+sync			# 手动将数据从内存同步到磁盘中（系统关机时会自动执行sync操作）
+halt			# 立即停机，等同于shutdown -H now
+poweroff		# 立即关机，等同于shutdown -P now
+reboot			# 立即重启，等同于shutdown -r now
+
+init 0			# 切换到关机模式（shutdown.target）
+init 6			# 切换到重启模式（reboot.target）
+```
+
+**sync有什么用？**
+
+> Linux 系统中为了提高磁盘的读写效率，对磁盘采取了 “预读迟写”操作方式。当用户 保存文件时，Linux 核心并不一定立即将保存数据写入物理磁盘中，而是将数据保存在缓 冲区中，等缓冲区满时再写入磁盘，这种方式可以极大的提高磁盘写入数据的效率。但是， 也带来了安全隐患，如果数据还未写入磁盘时，系统掉电或者其他严重问题出现，则将导 致数据丢失。使用 sync 指令可以立即将缓冲区的数据写入磁盘。
+
+**halt与poweroff的区别？**
+
+halt——关机但不关闭电源，即“停机”
+
+poweroff——关机且关闭电源，即真正意义上的“关机”
