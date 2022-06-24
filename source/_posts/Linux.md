@@ -8,17 +8,13 @@ tags: Linux
 ---
 # Linux学习笔记
 
-## TODO
-
-2.3.4为什么要配置主机名
-
 ## 前言
 
 ### 基于教程
 
 [3天搞定Linux，1天搞定Shell，清华学神带你通关（2022版）_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1WY4y1H7d3)
 
-（视频发布时间是2022-04-07，实际内容也非常新，应该是2022年3月份录制的）
+（视频发布时间是2022-04-07，实际内容也非常新，大概是2022年3月份录制的）
 
 ### 参考教程
 
@@ -28,7 +24,7 @@ tags: Linux
 
 [Linux 教程 | 菜鸟教程](https://www.runoob.com/linux/linux-tutorial.html)
 
-[Linux 命令大全 | 菜鸟教程](https://www.runoob.com/linux/linux-command-manual.html)
+[Linux命令大全(手册) – 真正好用的Linux命令在线查询网站](https://www.linuxcool.com/)
 
 [Linux 中国◆开源社区](https://linux.cn/)
 
@@ -384,37 +380,9 @@ hostnamectl set-hostname newhostname
 >
 > 参考资料：[hostnamectl命令 – 显示与设置主机名称 – Linux命令大全(手册)](https://www.linuxcool.com/hostnamectl)
 
-##### 为什么要配置主机名？TODO
+##### 配置主机名有什么用？
 
-主机名host name和域名domain name是有区别的，但是这里还有一个完整域名(Fully Qualified Domain Name, FQDN)的概念。
-
-> 如果你有一个服务器，绑定了多个域名：
->
-> - guoyunhe.me
-> - www.guoyunhe.me
-> - wiki.guoyunhe.me
-> - shop.guoyunhe.me
->
-> 你可以选择 “www”， “wiki” 和 “shop” 中的任何一个作为主机名。也可以另取一个，比如 “server” ， “vps-1″。
->
-> **第 1 步**：修改 **/etc/hostname** 文件。主机名只能包含数字，字母和连字符。
->
-> ```
-> server
-> ```
->
-> **第 2 步**：修改 **/etc/hosts** 文件。把完整域名 FQDN “server.guoyunhe.me” 放到主机名 “server” 之前。
->
-> ```
-> 127.0.0.1    localhost
-> 127.0.1.1    server.guoyunhe.me server guoyunhe.me www.guoyunhe.me wiki.guoyunhe.me shop.guoyunhe.me
-> ```
->
-> **第 3 步**：重启系统。
->
-> 检查主机名和域名： “**hostname**” 命令输出 server ， “**hostname -f**” 输出 server.guoyunhe.me 。
->
-> 参考资料：[正确设置 GNU/Linux 主机名 Hostname 和域名 Domain – 鹤仙人](https://guoyunhe.me/2016/08/25/set-hostname-and-domain-name-correctly/)
+首先要知道，主机名host name和域名domain name是有区别的，而且这里还有一个完整域名(Fully Qualified Domain Name, FQDN)的概念。
 
 举个例子：
 
@@ -424,6 +392,8 @@ hostnamectl set-hostname newhostname
 
 > 讲一个故事：刚开始，我发明了互联网通信(即在网上传输东西)，互联网通信是发生在TCP/IP协议之上(即这个协议是互联网通信的基础之一，TCP像车子，IP类似房子的地址)。IP就是上面说的这个TCP/IP协议的产物，有了他就可以想和谁通信就和谁通信，于是很多人开始把IP记住来通信，但是我发现很多人对数字不敏感，他们都说IP不好记。后来，我就发明了DNS解析，域名就是DNS的产物，如baidu.com就是一个域名，这个比那些IP的数字好记忆很多，得到了很多人的认可，他们不用再输入IP了，直接输入baidu.com就可以通信了，很开心。那么有人很好奇，就问：“域名能用了，那IP是不是就没法用了啊？”，我回答：“有啊，你回去输入IP试一试，和以前一样的。”。有人问：“那域名怎么就能通信了？”，我说：“因为我发明了的DNS帮了大忙，他把域名变成IP了啊:D”。有人问：“那域名不会重复吗？”，我回答：“不可能，我规定了不能重复，注册的时候都记录在本子上了，绝对不会重复。一句话，DNS让域名不会重复，懂了吗？”。有一天，有人跑过来问我，兴奋地说：“我发现了一个好玩的事情，我输入[www.baidu.com](http://www.baidu.com/)和baidu.com都能访问，为什么啊？”，我说：“你是否发现了多出一个www的东西？其实它叫'主机名'。”。 他又问：“那主机名有什么用？我不加www这个主机名，也可以通信(这里指上网)，那这个主机名不是没有作用了吗？还占用了位置呢，害我多输入几个字母。”。我说：“哈哈，不是没用，而是你用的机会少，但你用的机会少，你没用过，不代表他没有用啊。认知限制了你的想法啊~。在这里，我先把'主机'比作'房间'，你用baidu.com这个域名可以找到我的'房子'，但是你开了大门，进来的是我的'房子'的一个'房间'，这个就是'www房间'，是我在DNS规定的默认的缺省的'房间'，即你不填上主机(可以比作房间名或房间号)，默认就到这个'www房间'。而我还有其他的'房间'啊，我还有'a房间'、'b房间'、'Z房间'等等。你说你要进来'a房间'?容易啊，你加上主机(房间号)就可以啦，就是说你输入a.baidu.com就行啦。”。最后，还有人问我：“为什么默认是'www'啊？”。我说：“打个比方，我反问你一个问题：为什么你会说话的时候，叫你父亲作'爸爸'啊？”。 有人会回答是习惯。对，是习惯，习惯用'www'作为默认。 补充一点"不知道顶级域名的定义的请自行查阅资料"。好了，我把我的理解用文字说出来了，还有不懂，请追问：D
 > 参考资料：[有一个人说网址前面的www是主机名？主机？我懵了_百度知道](https://zhidao.baidu.com/question/461162404144932445.html)
+
+其次，虽然在客户机的hosts文件中配置的主机名并不一定要和Linux服务器的实际主机名一致——其实哪怕完全不一样也是可以进行远程登录的，客户机只要输对了自己本机的hosts文件中配置的主机名就行——但是通常我们还是把两者设置成一样的，方便检验是否登录到了正确的机器上。
 
 ### 2.4 远程管理
 
@@ -835,3 +805,360 @@ init 6			# 切换到重启模式（reboot.target）
 halt——关机但不关闭电源，即“停机”
 
 poweroff——关机且关闭电源，即真正意义上的“关机”
+
+## 3. 实操篇（常用命令）
+
+Shell可以看作是一个命令解释器，为我们提供了交互式的基于文本的控制台界面。
+
+Shell有很多种，Bash（Bourne Again Shell）就是其中之一，在Red Hat系的Linux发行版中常用。
+
+> 原文：[Linux中的shell和bash - 墨鱼菜鸡 - 博客园](https://www.cnblogs.com/csnd/p/11807739.html)
+>
+> ## shell
+>
+>  Shell 俗称壳（用来区别于核），是指“为使用者提供操作界面”的软件（命令解析器）。它类似于DOS下的command.com和后来的cmd.exe。它接收用户命令，然后调用相应的应用程序。
+>
+> 我们先来看一些Linux系统的结构
+>
+> ![20181129225709122](Linux/20181129225709122.png)
+>
+> 位于最内层的是硬件，然后是Linux系统内核。shell介于用户和系统内核之间。
+>
+> **那么shell的功能是什么呢？**
+>
+> shell用来接收我们用户的输入，并且解释我们的命令。然后将其传给系统内核，内核再调用硬件来操作。
+>
+> ### shell script 
+>
+> 我们很容易知道“Shell Script”指的是针对shell所写的脚本。我们将一些shell规定的语法与命令，再搭配正则表达式、管道命令与数据流重定向等功能，写成一个纯文本文件以达到我们想要的处理目的，再配以“.sh”的扩展名，这便是“Shell script”了。
+>
+> 简言之，我们只有通过Shell 这个工具来解释我们的命令等请求，我们才能成功实现与计算机的交流，同时再搭配Shell script可以批量处理命令的“程序”，我们就可以与计算机更优雅的交流哟！
+>
+> 我们可能会问：既然shell是解释命令的工具，那么这个工具可不可以多样化呢？不同的解释工具可不可以遵从不同的规则呢？ 
+> 这是必然的咯，何况是像Linux这种开源的好东西，怎么会缺乏多样性呢？！ 
+> 所以，我们就不难理解Linux中的shell有多种类型了吧，这其中最常用的几种是 **Bourne shell（sh）**、**Bourne Again shell(bash)** 和 **Debian Almquist Shell（dash）**。其中三种shell各有优缺点：
+>
+> ### sh
+>
+> **sh**(Bourne shell)是UNIX最初使用的shell，并且在每种UNIX上都可以使用。Bourne shell在shell编程方面相当优秀，但在处理与用户的交互方面做得不如其他几种shell。
+>
+> ### bash
+>
+> **bash** (Bourne Again shell)，它是Linux操作系统缺省的shell，是Bourne shell的扩展，简称**Bash**，与Bourne shell完全向后兼容，并且在Bourne shell的基础上增加、增强了很多特性。Bash放在/bin/bash 中，它有许多特色，可以提供如命令补全、命令编辑和命令历史表等功能，有灵活和强大的编程接口，同时又有很友好的用户界面。 而且在Redhat系列的Linux 操作系统中的 /bin/sh 是 /bin/bash 的符号链接。所以，用 sh执行脚本和bash 执行脚本，效果是一样的。所以我们通常会在脚本第一行写 #!/bin/bash ，意思就是用 /bin/bash 去执行这个脚本。
+>
+> ![20181129230731366](Linux/20181129230731366.png)
+>
+> ### Dash
+>
+> 虽然bash好用，功能也多。但是鉴于bash过于复杂，有人把bash从NetBSD移植到Debian Linux并更名为 **dash** (Debian Almquist Shell)，并建议将/bin/sh指向它，以获得更快的脚本执行速度。Dash Shell 比Bash Shell小的多，符合POSIX标准。也就是若脚本第一行为“#!/bin/sh”，则我们使用命令：sh script_name.sh 时是调用的dash去解释脚本；Debian下默认使用的还是bash，只不过sh指向的是dash
+>
+> ![20181129231219243](Linux/20181129231219243.png)
+
+### 3.1 帮助信息
+
+一部分具有基本功能的命令是内置在Shell中的，在系统启动后会随着Shell一起加载，并常驻在内存中，这就是“内置命令”。例如：`history`、`cd`。
+
+而其他的命令就叫做“外部命令”，外部命令要等到被调用时才会被加载到内存中。例如`ls`、`grep`。
+
+`man 命令名`
+
+获得该命令的帮助手册（manual），官方、权威、完整、详细。
+
+`man -f 命令名`
+
+查看该命令位于帮助手册的哪一页（同一命令可能有多处不同版本的解释）。
+
+`man 页数 命令名`
+
+指定手册的页数，查看命令解释。
+
+`type 命令名`
+
+。查看一个命令是不是Shell的内置命令（built-in），如果不是，则显示其别名。
+
+`help 内置命令名`
+
+获得Shell内置命令的帮助信息。
+
+`外部命令名 --help`
+
+获得外部命令的帮助信息。
+
+### 3.2 文件目录类
+
+`pwd`
+
+print working directory
+
+`pwd -P`
+
+显示真实目录。在进入软链接目录时才能体现出和`pwd`的差别。
+
+`cd -`
+
+返回到上一次所在目录
+
+`cd` / `cd ~`
+
+切换到当前用户的主文件夹
+
+`ls`
+
+list
+
+`ls -a`
+
+包括隐藏文件和隐藏目录，即带前缀“.”的。
+
+`ls -l` / `ll`
+
+显示详细信息
+
+`mkdir 目录名`
+
+make directories
+
+`mkdir -p 多级目录`
+
+递归创建多级目录。从外往里，比如`mkdir -p a/b/c` == `mkdir a a/b a/b/c`
+
+`rmdir 目录名`
+
+remove directory
+
+`rmdir -p 多级目录`
+
+用递归的方式删除指定的目录路径中的所有父级目录。从里往外，比如`rmdir a/b/c` == `rmdir a/b/c a/b a`
+
+`touch 文件名`
+
+touch命令的功能是用于创建空文件与修改时间戳。如果文件不存在，则会创建出一个空内容的文本文件；如果文件已经存在，则会对文件的Atime（访问时间）和Ctime（修改时间）进行修改操作，管理员可以完成此项工作，而普通用户只能管理主机的文件。
+
+`cp source dest `
+
+复制目录或文件
+
+`cp -r sourcedir destdir`
+
+递归地复制整个目录
+
+`\cp source dest`
+
+**任意命令前面加上反斜杠表示原生命令**，在此例中，`cp`实际上是`cp -i`的别名（可通过`type cp`验证），`-i`参数表示在覆盖文件时需要询问并确认，而`\cp`相当于是纯粹的、真正意义上不带任何参数的`cp`命令，即“原生”的`cp`命令，在覆盖文件时不会提醒。
+
+`rm file/dir`
+
+remove
+
+`rm -f file/dir`
+
+强制删除（不二次询问）
+
+`rm -r dir`
+
+递归删除，适用于删除整个目录
+
+> `rm -rf /*`
+>
+> 经典！强制且递归地删除根目录下所有文件和目录，并且没有任何提醒。
+
+`mv file/dir file/dir `
+
+move。剪切目录或文件后粘贴，在同一目录下进行则是重命名操作。
+
+`cat filename`
+
+concatenate。cat命令适合查看内容较少的、纯文本的文件。
+
+`cat -n filename`
+
+ 显示行数（空行也编号）。
+
+`more filename`
+
+比cat更加强大的文本查看工具。
+
+more命令的功能是用于分页显示文本文件内容。如果文本文件中的内容较多较长，使用cat命令读取后则很难看清，这时使用more命令进行分页查看就更加合适了，可以把文本内容一页一页的显示在终端界面上，用户每按一次回车即向下一行，每按一次空格即向下一页，直至看完为止。按b跳转到上一页，按f或空格跳转到下一页，按q退出。
+
+`less filename`
+
+比more更加强大的文本查看工具。
+
+按b（还支持PageUp键）跳转到上一页，按f或空格（还支持PageDown键）跳转到下一页，按q退出。
+
+按=号展示文件详情和当前阅读进度详情。
+
+按g跳到全文最开始，按shift+g跳到全文最末尾。
+
+按/+字符串向下查找，按n下一个，按N上一个
+
+按?+字符串向上查找，按n上一个，按N下一个
+
+`echo aString`
+
+echo是用于在终端设备上输出指定字符串或变量提取后值的命令，能够给用户一些简单的提醒信息，也可以将输出的指定字符串内容同管道符一起传递给后续命令作为标准输入信息再来进行二次处理，又或者同输出重定向符一起操作，将信息直接写入到文件中。
+
+如需提取变量值，需在变量名称前加入$符号做提取，变量名称一般均为大写形式。
+
+`echo -e aString`
+
+支持反斜杠控制的字符转换。
+
+`命令 > filename`
+
+输出重定向
+
+`命令 >> filename`
+
+不覆盖file的输出重定向
+
+`head filename`
+
+显示文件头部的部分内容，默认显示前10行
+
+`head -n 行数 filename`
+
+指定显示行数
+
+`tail filename`
+
+显示文件尾部的部分内容，默认显示后10行，加上参数-n同理。
+
+`tail -f filename`
+
+实时监控（刷新）文件内容变化，常用于监控日志变化。ctrl+s暂停刷新显示，ctrl+q恢复刷新显示。
+
+`ln -s 真实文件/目录所在路径 软链接文件保存路径`
+
+ln即link，-s即soft，创建软链接，类似Windows中的快捷方式。
+
+注意，“真实文件/目录所在路径”如果是相对路径，那么其参照系就是软链接文件的保存路径，而不是当前执行命令时所在目录！
+
+而软链接的文件如果用相对路径，那么其参照系就是当前执行命令所在目录。
+
+> 不加-s参数那就是创建硬链接。硬链接用得比较少，了解即可。
+
+`history`
+
+查看已经执行过的所有命令，可加数字参数表示只显示最后多少行。
+
+### 3.3 时间日期类
+
+`date`
+
+显示当前时间。
+
+> 打印出来的“CST”是中国标准时间（China Standard Time）的缩写。
+
+```
+[root@hadoop100 ~]# date
+Fri Jun 24 14:48:33 CST 2022
+[root@hadoop100 ~]# date +%Y
+2022
+[root@hadoop100 ~]# date +%y
+22
+[root@hadoop100 ~]# date +%m
+06
+[root@hadoop100 ~]# date +%d
+24
+[root@hadoop100 ~]# date +%H
+14
+[root@hadoop100 ~]# date +%M
+49
+[root@hadoop100 ~]# date +%S
+12
+[root@hadoop100 ~]# date +%s
+1656053354
+[root@hadoop100 ~]# 
+```
+
+所有参数的最前面一定要有个加号，在那之后就无论怎么连接都行，可以用减号、冒号等特殊符合。
+
+```
+[root@hadoop100 ~]# date +%Y-%m
+2022-06
+[root@hadoop100 ~]# date +%Y+%m
+2022+06
+[root@hadoop100 ~]# date +%Y=%m
+2022=06
+[root@hadoop100 ~]# date +%Y:%m
+2022:06
+[root@hadoop100 ~]# date +%Y：%m
+2022：06
+[root@hadoop100 ~]# date +%Y.%m
+2022.06
+[root@hadoop100 ~]# date +%Y-%m+%d=%H:%M：%S.%s
+2022-06+24=14:54：06.1656053646
+[root@hadoop100 ~]# date "+%Y-%m-%d %H:%M:%S"
+2022-06-24 14:55:02
+[root@hadoop100 ~]# 
+```
+
+但有些特殊符号不行，比如括号和空格——解决方法就是用双引号括起来。
+
+```
+[root@hadoop100 ~]# date +%Y(%m
+-bash: syntax error near unexpected token `('
+[root@hadoop100 ~]# date "+%Y(%m"
+2022(06
+[root@hadoop100 ~]# date +%Y %m
+date: extra operand ‘%m’
+Try 'date --help' for more information.
+[root@hadoop100 ~]# date "+%Y %m"
+2022 06
+[root@hadoop100 ~]# 
+```
+
+`date -d "数字 hours/minutes/... ago"`
+
+如果填数字n，n是正数就表示多少时间单位之前，如果是负数则代表之后。
+
+`date -s datestr`
+
+将系统时间设为datestr中所设定的时间，格式示例：`2077-06-24 02:00:00`。
+
+设定时间后如果想要用回原来的时间怎么办？需要用到`ntpdate `命令来更新（要加参数的），这里了解即可。
+
+`cal`
+
+Calendar。显示当前月的日期（等同于`cal -1`），默认将星期天作为月的第一天。
+
+`cal -m`
+
+将星期一作为月的第一天
+
+`cal -3`
+
+显示最近三个月的日历，只能是-1或-3，没有别的数字可以选择。
+
+`cal -y`
+
+显示当前年的日历
+
+`cal [options] [[[day] month] year]`
+
+可以指定显示某年某月某日的日历。
+
+### 3.4 用户权限类
+
+> 以下操作必须在管理员账户下进行，普通用户没有这种级别的权限。
+
+`useradd username`
+
+创建新用户，默认将该用户分配到同名用户组，默认在/home目录下新建一个同名目录作为该用户的个人目录。
+
+`useradd -d dir username`
+
+创建新用户并指定其个人目录
+
+`passwd username newpassword`
+
+设定或更改用户密码
+
+
+
+
+
+
+
+如果 tony 无法登陆，去 /etc/ssh/sshd_config 配置文件中把 PasswordAuthentication 改为yes
