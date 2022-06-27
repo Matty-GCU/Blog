@@ -24,9 +24,9 @@ tags: Linux
 
 [Linux 教程 | 菜鸟教程](https://www.runoob.com/linux/linux-tutorial.html)
 
-[Linux命令大全(手册) – 真正好用的Linux命令在线查询网站](https://www.linuxcool.com/)
-
 [Linux 中国◆开源社区](https://linux.cn/)
+
+[Linux命令大全(手册) – 真正好用的Linux命令在线查询网站](https://www.linuxcool.com/)
 
 ### 环境版本
 
@@ -886,6 +886,8 @@ Shell有很多种，Bash（Bourne Again Shell）就是其中之一，在Red Hat�
 
 ### 3.2 文件目录类
 
+#### 3.2.1 查看和切换工作目录
+
 `pwd`
 
 print working directory
@@ -902,6 +904,8 @@ print working directory
 
 切换到当前用户的主文件夹
 
+#### 3.2.2 列出目录内容
+
 `ls`
 
 list
@@ -910,9 +914,38 @@ list
 
 包括隐藏文件和隐藏目录，即带前缀“.”的。
 
+`ls -a`
+
+> -a, --all
+>               do not ignore entries starting with .
+
+`ls --block-size=SIZE`
+
+> --block-size=SIZE
+>               scale sizes by SIZE before printing them; e.g., '--block-size=M' prints sizes in units of  1,048,576  bytes;  see  SIZE
+>               format below
+
+`ls -h`
+
+human-readable，以容易理解的格式列出文件大小 (例如 1K 234M 2G)
+
+> **SIZE is an integer and optional unit (example: 10M is 10\*1024\*1024).  Units are K, M, G, T, P, E, Z, Y (powers of 1024) or KB,
+>        MB, ... (powers of 1000).**
+>
+> ——这个单位制非常重要！
+
 `ls -l` / `ll`
 
 显示详细信息
+
+> use a long listing format
+
+`ls -i`
+
+> -i, --inode
+>               print the index number of each file
+
+#### 3.2.3 创建和删除目录
 
 `mkdir 目录名`
 
@@ -930,9 +963,13 @@ remove directory
 
 用递归的方式删除指定的目录路径中的所有父级目录。从里往外，比如`rmdir a/b/c` == `rmdir a/b/c a/b a`
 
+#### 3.2.4 创建文件
+
 `touch 文件名`
 
 touch命令的功能是用于创建空文件与修改时间戳。如果文件不存在，则会创建出一个空内容的文本文件；如果文件已经存在，则会对文件的Atime（访问时间）和Ctime（修改时间）进行修改操作，管理员可以完成此项工作，而普通用户只能管理主机的文件。
+
+#### 3.2.5 复制文件或文件夹
 
 `cp source dest `
 
@@ -945,6 +982,8 @@ touch命令的功能是用于创建空文件与修改时间戳。如果文件不
 `\cp source dest`
 
 **任意命令前面加上反斜杠表示原生命令**，在此例中，`cp`实际上是`cp -i`的别名（可通过`type cp`验证），`-i`参数表示在覆盖文件时需要询问并确认，而`\cp`相当于是纯粹的、真正意义上不带任何参数的`cp`命令，即“原生”的`cp`命令，在覆盖文件时不会提醒。
+
+#### 3.2.6 删除和移动文件
 
 `rm file/dir`
 
@@ -965,6 +1004,8 @@ remove
 `mv file/dir file/dir `
 
 move。剪切目录或文件后粘贴，在同一目录下进行则是重命名操作。
+
+#### 3.2.7 查看文件
 
 `cat filename`
 
@@ -1004,6 +1045,8 @@ echo是用于在终端设备上输出指定字符串或变量提取后值的命�
 
 支持反斜杠控制的字符转换。
 
+#### 3.2.8 控制台显示和输出重定向
+
 `命令 > filename`
 
 输出重定向
@@ -1011,6 +1054,8 @@ echo是用于在终端设备上输出指定字符串或变量提取后值的命�
 `命令 >> filename`
 
 不覆盖file的输出重定向
+
+#### 3.2.9 监控文件变化
 
 `head filename`
 
@@ -1028,6 +1073,8 @@ echo是用于在终端设备上输出指定字符串或变量提取后值的命�
 
 实时监控（刷新）文件内容变化，常用于监控日志变化。ctrl+s暂停刷新显示，ctrl+q恢复刷新显示。
 
+#### 3.2.10 软链接
+
 `ln -s 真实文件/目录所在路径 软链接文件保存路径`
 
 ln即link，-s即soft，创建软链接，类似Windows中的快捷方式。
@@ -1036,7 +1083,17 @@ ln即link，-s即soft，创建软链接，类似Windows中的快捷方式。
 
 而软链接的文件如果用相对路径，那么其参照系就是当前执行命令所在目录。
 
-> 不加-s参数那就是创建硬链接。硬链接用得比较少，了解即可。
+#### 3.2.11 硬链接
+
+`ln 源文件 链接文件`
+
+不加-s参数那就是创建硬链接。
+
+扩展阅读：
+
+[详解 Linux 中的硬链接与软链接 - 腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/1690636)（精品好文！）
+
+#### 3.2.12 查看历史命令
 
 `history`
 
@@ -1141,7 +1198,9 @@ Calendar。显示当前月的日期（等同于`cal -1`），默认将星期天�
 
 ### 3.4 用户权限类
 
-> 以下操作必须在管理员账户下进行，普通用户没有这种级别的权限。
+> 以下大部分操作必须在管理员账户下进行，普通用户没有这种级别的权限。
+
+#### 3.4.1 添加和查看用户
 
 `useradd username`
 
@@ -1155,10 +1214,301 @@ Calendar。显示当前月的日期（等同于`cal -1`），默认将星期天�
 
 设定或更改用户密码
 
+`id username`
+
+id命令的功能是用于显示用户与用户组信息。
+
+显示的UID是该用户身份的唯一识别号码，GID是该用户的“主”用户组（即该用户的基本组）的唯一识别号码，GROUPS则是该用户所在的所有组（包括扩展组）。用户仅有一个基本组，但可以有多个扩展组。
+
+`cat/more/less /etc/passwd`
+
+查看所有用户。
+
+不过这个文件里面有很多系统用户（“伪用户”），是系统自动创建的，用来运行系统服务的，并不能作为真正的用户去登录。
+
+`su username`
+
+switch user。管理员切换至任意用户身份而无需密码验证，而普通用户切换至任意用户身份均需密码验证。
+
+切换用户之后，可以用`exit`退出当前会话，回到上一个会话，不需要输入密码。
+
+`who`
+
+显示当前登录用户信息，包含登录的用户名、终端、日期时间、进程等信息。
+
+若从root用户切换到user1用户，执行此命令会打印出**前者**的用户信息，也就是说它只认一开始登录会话的那个用户，不管嵌套登录的。
+
+`whoami`
+
+打印当前登录用户，若从root用户切换到user1用户，执行此命令会打印出**后者**的用户名。
+
+#### 3.4.2 获取root权限和删除用户
+
+`sudo 任何命令及其参数`
+
+sudo命令来自于英文词组“super user do”的缩写，中文译为“超级用户才能干的事”，其功能是用于授权普通用户执行管理员命令。
+
+使用sudo服务可以授权某个指定的用户去执行某些指定的命令，在满足工作需求的前提下尽可能少的放权，保证服务器的安全。配置sudo服务可以直接编辑配置文件/etc/sudoers。
+
+`userdel username`
+
+删除用户。
+
+Linux系统中一切都是文件，用户信息被保存到了/etc/passwd、/etc/shadow以及/etc/group文件中，因此使用userdel命令实际就是帮助我们删除了指定用户在上述三个文件中的对应信息。
+
+`userdel -r username`
+
+删除用户，顺便删除该用户的主目录。
+
+#### 3.4.3 用户组管理
+
+> 组的增加、删除和修改实际上就是对**/etc/group**文件的更新。
+
+`groupadd groupname`
+
+创建新的用户组
+
+`usermod -g newgroupname username`
+
+user modify。更改用户所在的用户组。
+
+`groupmod -n newname`
+
+groupmod命令用于更改群组的识别码或名称时。不过大家还是要注意，用户名不要随意修改，组名和 GID 也不要随意修改，因为非常容易导致管理员逻辑混乱。如果非要修改用户名或组名，则建议大家先删除旧的，再建立新的。
+
+#### 3.4.4 文件属性和权限
+
+<u>***文件基本属性介绍***</u>
+
+文件所有者**默认**为文件创建者，但是是可以修改的。
+
+文件所属组**默认**为文件创建者所属组，但也是可以修改的。
+
+![文件基本属性介绍](Linux/文件基本属性介绍.png)
+
+<u>***文件权限10位介绍***</u>
+
+- 第1位：  表示文件类型，`-`表示文件，`d`表示目录，`l`表示软链接，`b`表示供存储周边设备，`c`表示一次性读取装置
+- 2-4位：  表示文件所有者的权限，即U（User）权限
+- 5-7位：  表示文件所属组的成员的权限，即G（Group）权限
+- 8-10位：表示文件所有者和所属组的成员之外的用户的权限，即O（Others）权限
+- 2-10位：A（All）权限
+
+<u>***rwx权限作用到文件和目录的不同效果***</u>
+
+![rwx权限作用到文件和目录的不同效果](Linux/rwx权限作用到文件和目录的不同效果.png)
+
+#### 3.4.5 chmod
+
+chmod命令来自于英文词组”change mode“的缩写，其功能是用于改变文件或目录权限的命令。默认只有文件的所有者和管理员可以设置文件权限，普通用户只能管理自己文件的权限属性。
+
+设置权限时可以使用数字法，亦可使用字母表达式，对于目录文件建议加入-R参数进行递归操作，意味着不仅对于目录本身，也对目录内的子文件/目录都进行新权限的设定。
+
+<u>***方式一***</u>
+
+`chmod {u/g/o/a}{+/-/=}{r/w/x} filename/dirname`
+
+示例：
+
+* `chmod u+r aText`：该文件权限第2位变为`r`
+
+* `chmod u-r aText`：该文件权限第2位变为`-`
+
+* `chmod u=r aText`：该文件权限第2位变为`r`，第3、第4位变为`--`
+
+* `chmod a+r aText`：该文件权限第2、5、7位变为`r`
+
+<u>***方式二***</u>
+
+`chmod 八进制数字 filename/firname`
+
+把9位权限以二进制表示，再转换成3位八进制。
+
+示例：
+
+* `chmod 777 aText`：该文件权限的第2-10位变为`rwxrwxrwx`，即`111111111`
+* `chmod 644 aText`：该文件权限的第2-10位变为`rw-r--r--`，即`110100100`
+
+#### 3.4.6 chown、chgrp
+
+`chown 新属主 filename/dirname`
+
+`chown 新属主:新属组 filename/dirname`
+
+`chgrp 新属组 filename/dirname`
+
+chmod、chown、chgrp这几个命令都可以加上`-R`参数，表示递归处理，将指定目录下的所有文件及子目录一并处理。
+
+示例：
+
+```
+[root@hadoop100 桌面]# ll
+total 4660
+-rw-rw-rw-. 1 root root 4764088 Jun 23 22:11 aText
+-rw-r--r--. 1 root root      38 Jun 24 13:54 info
+[root@hadoop100 桌面]# chown user1 info
+[root@hadoop100 桌面]# ll
+total 4660
+-rw-rw-rw-. 1 root  root 4764088 Jun 23 22:11 aText
+-rw-r--r--. 1 user1 root      38 Jun 24 13:54 info
+[root@hadoop100 桌面]# chgrp user2 info
+[root@hadoop100 桌面]# ll
+total 4660
+-rw-rw-rw-. 1 root  root  4764088 Jun 23 22:11 aText
+-rw-r--r--. 1 user1 user2      38 Jun 24 13:54 info
+[root@hadoop100 桌面]# chown root:root info
+[root@hadoop100 桌面]# ll
+total 4660
+-rw-rw-rw-. 1 root root 4764088 Jun 23 22:11 aText
+-rw-r--r--. 1 root root      38 Jun 24 13:54 info
+[root@hadoop100 桌面]# 
+```
+
+### 3.5 搜索查找类
+
+#### 3.5.1 查找定位文件
+
+`find [路径] [参数]`
+
+不加路径则默认查找当前路径！
+
+-name匹配名称（可用模式匹配，常用`*`通配符）
+
+-user匹配所有者
+
+-group匹配所有组
+
+-size匹配文件的大小（+50KB为查找超过50KB的文件，而-50KB为查找小于50KB的文件）
+
+`find /root -name info`
+
+递归寻找/root目录下所能够匹配info（完全匹配）的文件和目录
+
+`find /root -name *.txt`
+
+递归寻找/root目录下所能够匹配"*.txt"的文件和目录
+
+`find /root -user username`
+
+不必多说
+
+`find /root -user groupname`
+
+不必多说
+
+`find -size n[cwbkMG]`
+
+>               File uses n units of space.  The following suffixes can be used:
+>
+>               `b'    for 512-byte blocks (this is the default if no suffix is used)
+>
+>               `c'    for bytes
+>
+>               `w'    for two-byte words
+>
+>               `k'    for Kilobytes (units of 1024 bytes)
+>
+>               `M'    for Megabytes (units of 1048576 bytes)
+>
+>               `G'    for Gigabytes (units of 1073741824 bytes)
+>
+>               The  size  does  not  count  indirect blocks, but it does count blocks in sparse files that are not actually allocated.
+>               Bear in mind that the \`%k\' and \`%b\' format specifiers of -printf handle  sparse  files  differently.   The  \`b\'  suffix
+>               always denotes 512-byte blocks and never 1 Kilobyte blocks, which is different to the behaviour of -ls.
+
+`updatedb`
+
+updatedb命令用来创建或更新 slocate/locate 命令所必需的数据库文件。
+
+updatedb命令的执行过程较长，因为在执行时它会遍历整个系统的目录树，并将所有的文件信息写入 slocate/locate 数据库文件中。 注意：slocate 本身具有一个数据库，里面存放了系统中文件与目录的相关信息。
+
+使用updatedb命令可以创建或更新locate所使用的数据库。如果数据库已经存在，它的数据是重复使用，以避免重读并没有改变的目录。updatedb通常每天由cron运行来更新默认的数据库。
+
+`locate xxx`（模糊匹配）
+
+locate命令的功能是用于快速查找文件或目录。与find命令进行全局搜索不同，locate命令是基于了数据文件（/var/lib/locatedb）进行的定点查找，由于缩小了搜索范围，因此快速快很多。
+
+Linux系统需定期执行下updatedb命令对数据库文件进行更新，然后再使用locate命令进行查找，这样才会更加准确。
+
+`which 命令名`
+
+which命令的功能是用于查找命令文件，能够快速搜索二进制程序所对应的位置。如果我们既不关心同名文件（find与locate），也不关心命令所对应的源代码和帮助文件（whereis），仅仅是想找到命令本身所在的路径，那么这个which命令就太合适了。
+
+`whereis 命令名`
+
+which命令的功能是用于查找命令文件，能够快速搜索二进制程序所对应的位置。如果我们既不关心同名文件（find与locate），也不关心命令所对应的源代码和帮助文件（whereis），仅仅是想找到命令本身所在的路径，那么这个which命令就太合适了。
+
+#### 3.5.2 内容过滤查找和管道操作
+
+`grep -n 查找内容 文件名`
+
+列出文件中所有的匹配行，显示行号。
+
+grep来自于英文词组“global search regular expression and print out the line”的缩写，意思是用于全面搜索的正则表达式，并将结果输出。人们通常会将grep命令与正则表达式搭配使用，参数作为搜索过程中的补充或对输出结果的筛选，命令模式十分灵活。
+
+与之容易混淆的是egrep命令和fgrep命令。如果把grep命令当作是标准搜索命令，那么egrep则是扩展搜索命令，等价于“grep -E”命令，支持扩展的正则表达式。而fgrep则是快速搜索命令，等价于“grep -F”命令，不支持正则表达式，直接按照字符串内容进行匹配。
+
+`其他命令及其参数 | grep 各种参数`
+
+“|”是管道符，也就是将前一个命令原本的输出内容输入到“管道”中，然后通过grep过滤后再输出。
+
+这里的关键并不是grep，因为管道符并不一定要和grep相搭配。
+
+`wc filename`
+
+Word count。统计文件的行数、字节数
+
+`其他命令及其参数 | wc`
+
+将前一个命令原本的输出内容输入到“管道”中，然后通过wc过滤后再输出。
+
+也就是统计前一个命令原本输出结果的行数、单词数、字节数
+
+### 3.6 压缩解压类
+
+#### 3.6.1 gzip / gunzip
+
+`gzip filename`
+
+Gnu zip，压缩文件。
+
+* 只能压缩为.gz文件
+* 只能压缩文件，不能压缩目录
+* 不保留原来的文件
+* 如果同时压缩多个文件，会产生多个压缩包
+
+`gunzip filename.gz`
+
+Gnu unzip，解压文件。只能解压.gz文件。
+
+`zip zipfile.zip orifile/oridir`
+
+压缩文件后缀为.zip（Windows系统常用）
+
+* 会保留源文件
+* 既可以压缩文件，也可以压缩目录
+* 压缩目录时可以加上`-r`参数表示递归
+
+* 压缩比没有gzip高
+
+`unzip filename -d desdir`
+
+unzip命令用于解压缩zip格式文件，虽然Linux系统中更多的使用tar命令进行对压缩包的管理工作，但有时也会收到同Windows系统常用的.zip和.rar格式的压缩包文件，unzip格式便派上了用场。直接使用unzip命令解压缩文件后，压缩包内原有的文件会被提取并输出保存到当前工作目录下。
+
+* 加上-d参数指定解压目录
+
+`tar`命令
+
+| 常用参数 | 作用                                              | man手册解释                                                  |
+| -------- | ------------------------------------------------- | ------------------------------------------------------------ |
+| -c       | 建立新的归档文件，打包成.tar文件                  | -c, --create<br/>              create a new archive          |
+| -x       | 从归档文件中提取文件，解包.tar文件                | -x, --extract, --get<br/>              extract files from an archive |
+| -v       | 显示指令执行过程                                  | -v, --verbose<br/>              verbosely list files processed |
+| -z       | 通过gzip指令压缩/解压缩文件，文件名最好为*.tar.gz | -z, --gzip<br/>              filter the archive through gzip |
+| -f       | 指定文件名                                        | -f, --file=ARCHIVE<br/>              use archive file or device ARCHIVE |
+| -C       | 指定目录                                          | -C, --directory=DIR<br/>              change to directory DIR |
 
 
 
 
 
-
-如果 tony 无法登陆，去 /etc/ssh/sshd_config 配置文件中把 PasswordAuthentication 改为yes
