@@ -1466,7 +1466,7 @@ Word count。统计文件的行数、字节数
 
 ### 3.6 压缩解压类
 
-#### 3.6.1 gzip / gunzip
+#### 3.6.1 gzip/gunzip压缩解压
 
 `gzip filename`
 
@@ -1480,6 +1480,8 @@ Gnu zip，压缩文件。
 `gunzip filename.gz`
 
 Gnu unzip，解压文件。只能解压.gz文件。
+
+#### 3.6.2 zip/unzip压缩解压
 
 `zip zipfile.zip orifile/oridir`
 
@@ -1495,20 +1497,49 @@ Gnu unzip，解压文件。只能解压.gz文件。
 
 unzip命令用于解压缩zip格式文件，虽然Linux系统中更多的使用tar命令进行对压缩包的管理工作，但有时也会收到同Windows系统常用的.zip和.rar格式的压缩包文件，unzip格式便派上了用场。直接使用unzip命令解压缩文件后，压缩包内原有的文件会被提取并输出保存到当前工作目录下。
 
-* 加上-d参数指定解压目录
+加上-d参数指定解压目录
+
+#### 3.6.3 tar打包解包
 
 `tar`命令
 
-| 常用参数 | 作用                                              | man手册解释                                                  |
-| -------- | ------------------------------------------------- | ------------------------------------------------------------ |
-| -c       | 建立新的归档文件，打包成.tar文件                  | -c, --create<br/>              create a new archive          |
-| -x       | 从归档文件中提取文件，解包.tar文件                | -x, --extract, --get<br/>              extract files from an archive |
-| -v       | 显示指令执行过程                                  | -v, --verbose<br/>              verbosely list files processed |
-| -z       | 通过gzip指令压缩/解压缩文件，文件名最好为*.tar.gz | -z, --gzip<br/>              filter the archive through gzip |
-| -f       | 指定文件名                                        | -f, --file=ARCHIVE<br/>              use archive file or device ARCHIVE |
-| -C       | 指定目录                                          | -C, --directory=DIR<br/>              change to directory DIR |
+| 常用参数       | 作用                                                   | man手册解释                                                  |
+| -------------- | ------------------------------------------------------ | ------------------------------------------------------------ |
+| -c             | 建立新的归档文件，打包成.tar文件                       | -c, --create<br/>              create a new archive          |
+| -x             | 从归档文件中提取文件，解包.tar文件                     | -x, --extract, --get<br/>              extract files from an archive |
+| -v             | 显示指令执行过程                                       | -v, --verbose<br/>              verbosely list files processed |
+| -z             | 通过gzip指令压缩/解压缩文件，文件名最好为*.tar.gz      | -z, --gzip<br/>              filter the archive through gzip |
+| -f             | 实际上我没看懂这个参数的解释。似乎是表示“打包或解包”？ | -f, --file=ARCHIVE<br/>              use archive file or device ARCHIVE |
+| -C             | 指定保存目录（仅用于解压或解包）                       | -C, --directory=DIR<br/>              change to directory DIR |
+| --remove-files | 打包后自动删除原文件                                   | --remove-files<br/>              remove files after adding them to the archive |
+| -t             | 列出备份文件的内容                                     | -t, --list<br/>              list the contents of an archive |
 
+**最佳实践（通常带-v，必须带-f）**：
 
+`tar -czvf xxx.tar.gz [待压缩文件1 待压缩目录1 ...]`
 
+对指定文件和目录（包括子目录和子文件）使用tar进行打包后再使用gzip进行压缩，产生xxx.tar.gz文件。
 
+`tar -xzvf xxx.tar.gz`
 
+对该文件使用gunzip进行解压后再使用gzip进行解包，保存到当前目录。
+
+`tar -cvf xxx.tar [待压缩文件1 待压缩目录1 ...]`
+
+对指定文件和目录（包括子目录和子文件）使用tar进行打包（但不使用gzip进行压缩），产生xxx.tar文件。
+
+`tar -cvf xxx.tar *.cfg`
+
+对当前工作目录内所有以.cfg为后缀的文件使用tar打包（但不使用gzip进行压缩），产生xxx.tar文件。
+
+`tar -tvf xxx.tar`
+
+查看某个.tar包内的文件信息（无需解包）。
+
+`tar -xvf xxx.tar -C 保存目录`
+
+解包到指定目录。
+
+`tar -xzvf xxx.tar.gz -C 保存目录`
+
+解压到指定目录。
