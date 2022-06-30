@@ -1543,3 +1543,31 @@ unzip命令用于解压缩zip格式文件，虽然Linux系统中更多的使用t
 `tar -xzvf xxx.tar.gz -C 保存目录`
 
 解压到指定目录。
+
+### 3.7 磁盘管理类
+
+#### 3.7.1 查看目录占用空间大小
+
+CentOS 7默认未安装tree命令，故需要先执行`yum install tree`
+
+`tree`
+
+以树状图形式列出目录内容，帮助运维人员快速了解到目录的层级关系。
+
+| 参数 | 作用                                   | man手册解释                                                  |
+| ---- | -------------------------------------- | ------------------------------------------------------------ |
+| -C   | 彩色显示                               | -C     Turn colorization on always, using built-in color defaults if the LS_COLORS environment variable is not set.  Useful to<br/>              colorize output to a pipe. |
+| -N   | 直接列出文件和目录名称（能够显示中文） | -N     Print non-printable characters as is instead of as escaped octal numbers. |
+
+`du`
+
+Disk Usage，查看文件或目录的大小。
+
+| 常用参数 | 作用                                         | man手册解释                                                  |
+| -------- | -------------------------------------------- | ------------------------------------------------------------ |
+| -a       | 显示目录中所有文件大小，而不是仅仅统计子目录 | -a, --all<br/>              write counts for all files, not just directories |
+| -k       | 以KB为单位显示文件大小                       | -k     like --block-size=1K                                  |
+| -m       | 以MB为单位显示文件大小                       | -m     like --block-size=1M                                  |
+| -B       | 设置文件大小的显示单位                       | -B, --block-size=SIZE<br/>              scale sizes by SIZE before printing them; e.g., '-BM' prints sizes in units of 1,048,576 bytes; see SIZE format below |
+| -h       | 以易读方式显示文件大小                       | -h, --human-readable<br/>              print sizes in human readable format (e.g., 1K 234M 2G) |
+| -s       | 仅显示总计                                   | -s, --summarize<br/>              display only a total for each argument |
