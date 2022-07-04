@@ -1,6 +1,6 @@
 ---
 abbrlink: c460cf59
-title: MyBatis3学习笔记
+title: MyBatis学习笔记
 tags:
 	- SSM
 	- MyBatis
@@ -15,7 +15,7 @@ date: 2022-02-12
 updated: 2022-02-12
 ---
 
-# MyBatis3学习笔记
+# MyBatis学习笔记
 
 ## 零. 前言
 

@@ -1,6 +1,6 @@
 ---
 abbrlink: 91344c8b
-title: Spring5学习笔记
+title: Spring学习笔记
 tags:
 	- SSM
 	- Spring
@@ -14,7 +14,7 @@ date: 2022-04-04 00:00:00
 updated: 2022-04-04 00:00:00
 ---
 
-# Spring5学习笔记
+# Spring学习笔记
 
 ## 零. 前言
 

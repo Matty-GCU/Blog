@@ -117,7 +117,7 @@ VMWare官网：https://www.vmware.com/cn.html
 >
 > <u>你还可以在 `/usr` 目录下找到 `bin`，`sbin`，`lib` 目录，它们与挂载到根目录下的那些有什么区别呢？现在的区别不是很大。</u>在早期，`/bin` 目录（挂载在根目录下的）只会包含一些基本的命令，例如 `ls`、`mv` 和 `rm` ；这是一些在安装系统的时候就会预装的一些命令，用于维护系统的一个基本的命令。 而 `/usr/bin` 目录则包含了用户自己安装和用于工作的软件，例如文字处理器，浏览器和一些其他的软件。
 >
-> <u>但是许多现代的 Linux 发行版只是把所有的东西都放到 `/usr/bin` 中，并让 `/bin` 指向 `/usr/bin`，以防彻底删除它会破坏某些东西。</u>因此，Debian、Ubuntu 和 Mint 仍然保持 `/bin` 和 `/usr/bin` （和 `/sbin` 和 `/usr/sbin` ）分离；其他的，比如 Arch 和它衍生版，只是有一个“真实”存储二进制程序的目录，`/usr/bin`，其余的任何 `bin` 目录是指向 `/usr/`bin` 的“假”目录。
+> <u>但是许多现代的 Linux 发行版只是把所有的东西都放到 `/usr/bin` 中，并让 `/bin` 指向 `/usr/bin`，以防彻底删除它会破坏某些东西。</u>因此，Debian、Ubuntu 和 Mint 仍然保持 `/bin` 和 `/usr/bin` （和 `/sbin` 和 `/usr/sbin` ）分离；其他的，比如 Arch 和它衍生版，只是有一个“真实”存储二进制程序的目录，`/usr/bin`，其余的任何 `bin` 目录是指向 `/usr/`bin 的“假”目录。
 >
 > #### /lib (library)
 >
@@ -1571,3 +1571,46 @@ Disk Usage，查看文件或目录的大小。
 | -B       | 设置文件大小的显示单位                       | -B, --block-size=SIZE<br/>              scale sizes by SIZE before printing them; e.g., '-BM' prints sizes in units of 1,048,576 bytes; see SIZE format below |
 | -h       | 以易读方式显示文件大小                       | -h, --human-readable<br/>              print sizes in human readable format (e.g., 1K 234M 2G) |
 | -s       | 仅显示总计                                   | -s, --summarize<br/>              display only a total for each argument |
+
+#### 3.7.2 查看磁盘使用情况
+
+> 这部分听得不是很懂，而且听得很困……了解即可。
+
+`df -h`
+
+Disk Free，用于显示系统上磁盘空间的使用量情况。
+
+`free -h`
+
+显示系统内存使用量情况，包含物理和交换内存的总量、使用量和空闲量情况。
+
+#### 3.7.3 查看设备挂载情况
+
+> 这部分听得不是很懂，而且听得很困……了解即可。
+
+`lsblk -f`
+
+list block，查看详细的设备挂载情况，显示文件系统信息。
+
+#### 3.7.4 挂载和卸载
+
+`mount 设备文件名 挂载目录名(挂载点)`
+
+挂载设备。
+
+可以先用`lsblk`查看设备挂载情况，可以看到新设备有没有挂载。
+
+注意在有图形界面模式的情况下（`init 5`），一旦有新设备，系统就会帮我们自动挂载。但在无图形界面的情况下，我们需要手动挂载新设备。
+
+![mount命令的参数](Linux/mount命令的参数.png)
+
+`umount 设备文件名或挂载点`
+
+卸载设备。注意是**u**mount，不是unmount。
+
+**设置开机自动挂载**
+
+修改`/etc/fstab`文件
+
+#### 3.7.5 磁盘分区
+
