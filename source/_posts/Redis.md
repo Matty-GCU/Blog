@@ -7,7 +7,7 @@ categories: Redis
 tags: Redis
 ---
 
-# Redis学习笔记
+# Redis学习笔记（已断更）
 
 ## 零. 前言
 
